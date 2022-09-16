@@ -1,11 +1,23 @@
 import Link from "next/link";
 import React from "react";
-
+// import client 
+import { client } from '../lib/helpers';
 export default function Login() {
+	// Save email and password from form
+	const saveForm = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		console.log(event.target);
+		const $email = event.target?.email;
+		const $password = event.target?.password;
+		const body = { email: $email.value, password: $password.value }
+		console.log(JSON.stringify(body))
+		const result = await client('/login', { body });
+
+	}
 	return (
 		<div className="w-full h-[100vh] flex justify-center items-center">
 			<div className="card card-normal bg-base-300 shadow-lg max-w-lg">
-				<form className="card-body">
+				<form className="card-body" onSubmit={saveForm}>
 					<div className="card-title">
 						<h1>Welcome to kanban</h1>
 					</div>
@@ -15,9 +27,9 @@ export default function Login() {
 						</label>
 						<input
 							type="email"
-							name="username"
+							name="email"
 							placeholder="type here"
-							id="username"
+							id="email"
 							className="input input-bordered"
 							required
 						/>

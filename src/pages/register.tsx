@@ -1,11 +1,19 @@
 import Link from "next/link";
 import React from "react";
+import { client } from '../lib/helpers';
 
 export default function register() {
+	const registerUser = async (event: React.FormEvent<HTMLFormElement>) => {
+		event.preventDefault();
+		const $email = event.target?.email;
+		const $password = event.target?.password;
+		const body = { email: $email.value, password: $password.value }
+		const result = await client('/register', { body });
+	}
 	return (
 		<div className="w-full h-[100vh] flex justify-center items-center">
 			<div className="card card-normal bg-base-300 shadow-lg max-w-lg">
-				<form className="card-body">
+				<form className="card-body" onSubmit={registerUser}>
 					<div className="card-title">
 						<h1>Create a kanban account</h1>
 					</div>
@@ -15,7 +23,7 @@ export default function register() {
 						</label>
 						<input
 							type="email"
-							name="username"
+							name="email"
 							placeholder="type here"
 							id="username"
 							className="input input-bordered"
