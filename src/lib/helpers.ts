@@ -6,6 +6,7 @@ export const client = async (endpoint: RequestInfo, options?: RequestInit) => {
 	let config: RequestInit = {
 		method: body ? "POST" : "GET",
 		...customConfig,
+		credentials: "include",
 		headers: {
 			...headers,
 			...customConfig.headers,
@@ -17,10 +18,6 @@ export const client = async (endpoint: RequestInfo, options?: RequestInit) => {
 	let dataReturned;
 
 	const response = await window.fetch(`${API}${endpoint}`, config);
-	if (response.status === 401) {
-		window.location.assign(window.location.pathname);
-		return;
-	}
 
 	if (response.ok) {
 		dataReturned = await response.json();

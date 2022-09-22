@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React from "react";
+import toast from "react-hot-toast";
 import { client } from "../lib/helpers";
 
 export default function Register() {
@@ -19,7 +20,7 @@ export default function Register() {
 			name: $name.value,
 		};
 		try {
-			const result = await client("/register", {
+			const result = await client("/auth/register", {
 				body: body as unknown as BodyInit,
 			});
 			if (result.status === 201) {
@@ -84,6 +85,27 @@ export default function Register() {
 					</div>
 					<div className="card-actions">
 						<button className="btn btn-primary w-full">Register</button>
+						<button
+							type="button"
+							onClick={async (e) => {
+								e.preventDefault();
+								try {
+									const result = await client("/me");
+									console.log(result);
+									// router.push("/profile", undefined, { shallow: true });
+								} catch (error) {
+									if (error instanceof Error) {
+										toast.error(error.message, {
+											duration: 5000,
+											className: "mt-8",
+										});
+									}
+								}
+							}}
+							className="btn btn-primary"
+						>
+							/ME
+						</button>
 						<p>
 							Have an account?{" "}
 							<Link href="login">
