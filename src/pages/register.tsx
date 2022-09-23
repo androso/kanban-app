@@ -5,6 +5,9 @@ import toast from "react-hot-toast";
 import { client } from "../lib/helpers";
 
 export default function Register() {
+	// todo: if user is logged in, redirect to /app
+	// todo: if user is not logged in, show this.
+
 	const router = useRouter();
 	const [registerError, setRegisterError] = React.useState<null | Error>(null);
 
@@ -85,27 +88,6 @@ export default function Register() {
 					</div>
 					<div className="card-actions">
 						<button className="btn btn-primary w-full">Register</button>
-						<button
-							type="button"
-							onClick={async (e) => {
-								e.preventDefault();
-								try {
-									const result = await client("/me");
-									console.log(result);
-									// router.push("/profile", undefined, { shallow: true });
-								} catch (error) {
-									if (error instanceof Error) {
-										toast.error(error.message, {
-											duration: 5000,
-											className: "mt-8",
-										});
-									}
-								}
-							}}
-							className="btn btn-primary"
-						>
-							/ME
-						</button>
 						<p>
 							Have an account?{" "}
 							<Link href="login">

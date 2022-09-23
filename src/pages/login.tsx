@@ -5,7 +5,10 @@ import toast from "react-hot-toast";
 import { client } from "../lib/helpers";
 // so far we make requests, but how do we get the user data?
 export default function Login() {
-	// Save email and password from form
+	// todo: if user is logged in, redirect to /app
+	// todo: if user is not logged in, show this.
+
+
 	const router = useRouter();
 	const [loginError, setLoginError] = React.useState<null | Error>(null);
 	const loginUser = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -19,7 +22,7 @@ export default function Login() {
 				body: body as unknown as BodyInit,
 			});
 			console.log(result);
-			router.push("/profile", undefined, { shallow: true });
+			router.push("/app", undefined, { shallow: true });
 		} catch (error) {
 			if (error instanceof Error) {
 				toast.error(error.message, {
@@ -66,27 +69,6 @@ export default function Login() {
 					</div>
 					<div className="card-actions">
 						<button className="btn btn-primary w-full">Login</button>
-						<button
-							type="button"
-							onClick={async (e) => {
-								e.preventDefault();
-								try {
-									const result = await client("/me");
-									console.log(result);
-									// router.push("/profile", undefined, { shallow: true });
-								} catch (error) {
-									if (error instanceof Error) {
-										toast.error(error.message, {
-											duration: 5000,
-											className: "mt-8",
-										});
-									}
-								}
-							}}
-							className="btn btn-primary"
-						>
-							/ME
-						</button>
 						<p>
 							Not a member?{" "}
 							<Link href="register">
