@@ -5,7 +5,7 @@ import useUser from "./useUser";
 import { useRouter } from "next/router";
 
 export const useAuth = () => {
-	const { updateUser } = useUser();
+	const { updateUser, clearUser } = useUser();
 	const router = useRouter();
 
 	const login = async (email: string, password: string) => {
@@ -37,8 +37,16 @@ export const useAuth = () => {
 			router.push("/login", undefined, { shallow: true });
 		}
 	};
+
+	const logout = async () => {
+		await client("/auth/logout", null, "POST");
+		clearUser();
+		router.push("/login", undefined, { shallow: true });
+	};
+
 	return {
 		login,
 		register,
+		logout,
 	};
 };
