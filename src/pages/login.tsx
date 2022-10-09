@@ -1,6 +1,8 @@
 import Link from "next/link";
 import React from "react";
 import toast from "react-hot-toast";
+import LoadingSpinner from "../components/LoadingSpinner";
+import PageContainer from "../components/PageContainer";
 
 import { useAuth } from "../lib/hooks/useAuth";
 import useRedirectIfAuthorized from "../lib/hooks/useRedirectIfAuthorized";
@@ -24,58 +26,62 @@ export default function Login() {
 			toast.error("Invalid credentials");
 		}
 	};
-	if (status === "loading") {
-		return <div>Loading...</div>;
-	}
+
 	return (
-		<div className="w-full h-[100vh] flex justify-center items-center">
-			<div className="card card-normal bg-base-300 shadow-lg max-w-lg">
-				<form className="card-body" onSubmit={loginUser}>
-					<div className="card-title">
-						<h1>Welcome to kanban</h1>
-					</div>
+		<PageContainer>
+			{status === "loading" ? (
+				<LoadingSpinner />
+			) : (
+				<div className="card card-normal bg-base-300 shadow-lg max-w-lg">
+					<form className="card-body" onSubmit={loginUser}>
+						<div className="card-title">
+							<h1>Welcome to kanban</h1>
+						</div>
 
-					{loginError && (
-						<span className="label-text text-error">{loginError?.message}</span>
-					)}
+						{loginError && (
+							<span className="label-text text-error">
+								{loginError?.message}
+							</span>
+						)}
 
-					<div className="form-control w-full max-w-xs">
-						<label htmlFor="email" className="label">
-							<span className="label-text">Email</span>
-						</label>
-						<input
-							type="email"
-							name="email"
-							placeholder="type here"
-							id="email"
-							className="input input-bordered"
-							required
-						/>
-					</div>
-					<div className="form-control w-full max-w-xs mb-4">
-						<label htmlFor="password" className="label">
-							<span className="label-text">Password</span>
-						</label>
-						<input
-							type="password"
-							name="password"
-							placeholder="type here"
-							id="password"
-							className="input input-bordered"
-							required
-						/>
-					</div>
-					<div className="card-actions">
-						<button className="btn btn-primary w-full">Login</button>
-						<p>
-							Not a member?{" "}
-							<Link href="register">
-								<a className="link text-blue-500">Register now</a>
-							</Link>
-						</p>
-					</div>
-				</form>
-			</div>
-		</div>
+						<div className="form-control w-full max-w-xs">
+							<label htmlFor="email" className="label">
+								<span className="label-text">Email</span>
+							</label>
+							<input
+								type="email"
+								name="email"
+								placeholder="type here"
+								id="email"
+								className="input input-bordered"
+								required
+							/>
+						</div>
+						<div className="form-control w-full max-w-xs mb-4">
+							<label htmlFor="password" className="label">
+								<span className="label-text">Password</span>
+							</label>
+							<input
+								type="password"
+								name="password"
+								placeholder="type here"
+								id="password"
+								className="input input-bordered"
+								required
+							/>
+						</div>
+						<div className="card-actions">
+							<button className="btn btn-primary w-full">Login</button>
+							<p>
+								Not a member?{" "}
+								<Link href="register">
+									<a className="link text-blue-500">Register now</a>
+								</Link>
+							</p>
+						</div>
+					</form>
+				</div>
+			)}
+		</PageContainer>
 	);
 }
