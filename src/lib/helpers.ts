@@ -1,11 +1,15 @@
 const API = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-export const client = async (endpoint: RequestInfo, options?: RequestInit) => {
+export const client = async (
+	endpoint: RequestInfo,
+	options?: RequestInit | null,
+	method: string = "GET"
+) => {
 	const { body, ...customConfig } = options ?? {};
 	const headers = { "Content-Type": "application/json" };
 
 	let config: RequestInit = {
-		method: body ? "POST" : "GET",
+		method: body ? "POST" : method,
 		...customConfig,
 		credentials: "include",
 		headers: {
