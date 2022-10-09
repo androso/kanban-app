@@ -1,4 +1,5 @@
 const API = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 export const client = async (endpoint: RequestInfo, options?: RequestInit) => {
 	const { body, ...customConfig } = options ?? {};
 	const headers = { "Content-Type": "application/json" };
@@ -13,8 +14,9 @@ export const client = async (endpoint: RequestInfo, options?: RequestInit) => {
 		},
 	};
 	if (body) {
-		config.body = JSON.stringify(body);
+		config.body = body;
 	}
+
 	let dataReturned;
 
 	const response = await window.fetch(`${API}${endpoint}`, config);
