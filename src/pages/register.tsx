@@ -1,34 +1,21 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
 import React from "react";
-import toast from "react-hot-toast";
-import { client } from "../lib/helpers";
+import { useAuth } from "../lib/hooks/useAuth";
+import useRedirectIfAuthorized from "../lib/hooks/useRedirectIfAuthorized";
 
 export default function Register() {
-	// todo: if user is logged in, redirect to /app
 	// todo: if user is not logged in, show this.
-
-	const router = useRouter();
+	useRedirectIfAuthorized();
+	const { register } = useAuth();
 	const [registerError, setRegisterError] = React.useState<null | Error>(null);
 
 	const registerUser = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
-
 		const $email = event.currentTarget.elements[0] as HTMLInputElement;
-		const $name = event.currentTarget.elements[1] as HTMLInputElement;
+		const $username = event.currentTarget.elements[1] as HTMLInputElement;
 		const $password = event.currentTarget.elements[2] as HTMLInputElement;
-		const body = {
-			email: $email.value,
-			password: $password.value,
-			name: $name.value,
-		};
 		try {
-			const result = await client("/auth/register", {
-				body: body as unknown as BodyInit,
-			});
-			if (result.status === 201) {
-				router.push("/login", undefined, { shallow: true });
-			}
+			await register($username.value, $email.value, $password.value);
 		} catch (error) {
 			if (error instanceof Error) {
 				setRegisterError(error);
@@ -42,10 +29,11 @@ export default function Register() {
 					<div className="card-title">
 						<h1>Create a kanban account</h1>
 					</div>
-
-					<span className="label-text text-error">
-						{registerError?.message}
-					</span>
+					{registerError && (
+						<span className="label-text text-error">
+							{registerError?.message}
+						</span>
+					)}
 
 					<div className="form-control w-full max-w-xs">
 						<label htmlFor="username" className="label">
@@ -66,9 +54,9 @@ export default function Register() {
 						</label>
 						<input
 							type="text"
-							name="name"
+							name="username"
 							placeholder="type here"
-							id="name"
+							id="username"
 							className="input input-bordered"
 							required
 						/>

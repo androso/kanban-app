@@ -1,39 +1,32 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React from "react";
 import toast from "react-hot-toast";
-import { client } from "../lib/helpers";
+
+import { useAuth } from "../lib/hooks/useAuth";
+import useRedirectIfAuthorized from "../lib/hooks/useRedirectIfAuthorized";
 // so far we make requests, but how do we get the user data?
 export default function Login() {
-	// todo: if user is logged in, redirect to /app
-	// todo: if user is not logged in, show this.
+	const { status } = useRedirectIfAuthorized();
 
-
-	const router = useRouter();
 	const [loginError, setLoginError] = React.useState<null | Error>(null);
+	const { login } = useAuth();
+
 	const loginUser = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		const $email = event.currentTarget.elements[0] as HTMLInputElement;
 		const $password = event.currentTarget.elements[1] as HTMLInputElement;
-		const body = { email: $email.value, password: $password.value };
-
 		try {
-			const result = await client("/auth/login", {
-				body: body as unknown as BodyInit,
-			});
-			console.log(result);
-			router.push("/app", undefined, { shallow: true });
+			await login($email.value, $password.value);
 		} catch (error) {
 			if (error instanceof Error) {
-				toast.error(error.message, {
-					duration: 5000,
-					className: "mt-8",
-				});
 				setLoginError(error);
 			}
+			toast.error("Invalid credentials");
 		}
 	};
-
+	if (status === "loading") {
+		return <div>Loading...</div>;
+	}
 	return (
 		<div className="w-full h-[100vh] flex justify-center items-center">
 			<div className="card card-normal bg-base-300 shadow-lg max-w-lg">
@@ -41,6 +34,11 @@ export default function Login() {
 					<div className="card-title">
 						<h1>Welcome to kanban</h1>
 					</div>
+
+					{loginError && (
+						<span className="label-text text-error">{loginError?.message}</span>
+					)}
+
 					<div className="form-control w-full max-w-xs">
 						<label htmlFor="email" className="label">
 							<span className="label-text">Email</span>
