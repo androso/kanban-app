@@ -7,5 +7,7 @@ export default function PageContainer({
 	children: React.ReactNode;
 	extraCss?: string;
 }) {
-	return <div className={`min-w-full min-h-[100vh]  ${extraCss}`}>{children}</div>;
+	return (
+		<div className={`min-w-full min-h-[100vh]  ${extraCss}`}>{children}</div>
+	);
 }
