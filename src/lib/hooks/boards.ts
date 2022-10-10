@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { customTimePause } from "../helpers";
 
 const fakeBoards = [
 	{
@@ -24,6 +25,8 @@ const fakeBoards = [
 export const useBoards = () => {
 	const { data: boards, status } = useQuery(["userBoards"], async () => {
 		// await client("/boards");
+		await customTimePause(1000);
+
 		return fakeBoards;
 	});
 

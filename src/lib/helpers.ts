@@ -33,3 +33,7 @@ export const client = async (
 		return Promise.reject(new Error(errorMessage));
 	}
 };
+
+export const customTimePause = async (ms: number) => {
+	return new Promise((resolve) => setTimeout(resolve, ms));
+};
