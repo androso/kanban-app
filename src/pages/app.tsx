@@ -5,6 +5,10 @@ import { useAuth } from "../lib/hooks/useAuth";
 import useProtectedRoute from "../lib/hooks/useProtectedRoute";
 import Navbar from "../components/Layout/Navbar";
 
+import { useEffect, useState } from "react";
+import { useBoards } from "../lib/hooks/boards";
+import Drawer from "../components/Layout/Drawer";
+
 export default function App() {
 	// if user is not logged in, redirect to /login
 	// if user is logged in, allow them access.
@@ -18,17 +22,36 @@ export default function App() {
 			toast.error("Error while logging out");
 		}
 	};
+	const { boards, status: boardsStatus } = useBoards();
+	// if it's null, means user dosn't have any boards created.
+	const [activeBoardId, setActiveBoardId] = useState<number | null>(null);
+
+	useEffect(() => {
+		if (boardsStatus === "success" && boards) {
+			setActiveBoardId(boards[0].id);
+		} else {
+			setActiveBoardId(null);
+		}
+	}, [boards, boardsStatus]);
+
 	return (
 		<PageContainer>
 			{status === "loading" ? (
 				<LoadingSpinner />
 			) : user ? (
-				<Navbar>
+				<Drawer
+					activeBoardId={activeBoardId}
+					setActiveBoardId={setActiveBoardId}
+				>
+					<Navbar
+						activeBoardId={activeBoardId}
+						setActiveBoardId={setActiveBoardId}
+					/>
 					<h1>hello {user.email}</h1>
-					<button className="btn btn-secondary" onClick={() => closeSession()}>
-						Logout
-					</button>
-				</Navbar>
+					<p>
+						You{`'`}re currently using board: {activeBoardId}
+					</p>
+				</Drawer>
 			) : null}
 		</PageContainer>
 	);

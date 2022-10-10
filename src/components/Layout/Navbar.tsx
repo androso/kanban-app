@@ -4,52 +4,59 @@ import { useAuth } from "../../lib/hooks/useAuth";
 import Image from "next/image";
 import { useBoards } from "../../lib/hooks/boards";
 import { Icon } from "@iconify/react";
-import { useRouter } from "next/router";
 
-export default function Navbar({ children }: { children: React.ReactNode }) {
+// navigation bar + sidebar (desktop)
+
+
+export default function Navbar({
+	activeBoardId,
+	setActiveBoardId,
+}: {
+	activeBoardId?: number | null;
+	setActiveBoardId?: (id: number) => void;
+}) {
 	const { logout } = useAuth();
 	const { boards, status } = useBoards();
-	const router = useRouter();
 
 	return (
-		<div className="navbar flex items-center justify-between bg-[#242933] ">
-			<div className="flex ">
-				<div>
-					<Image
-						src="/wicked.png"
-						width={50}
-						height={50}
-						alt="company logo"
-						title="company logo"
-					/>
-				</div>
-				{router.pathname.includes("/app/board/") && (
-					<div className="flex-1">
-						<div className="dropdown">
+		<div className="navbar flex md:justify-end items-center justify-between bg-[#242933] ">
+			<div className="flex-1  md:hidden">
+				<div className="dropdown">
+					{status === "loading" ? (
+						<label className="btn btn-ghost">...</label>
+					) : (
+						<>
 							<label tabIndex={0} className="btn btn-ghost">
-								Boards
+								{status === "success" &&
+									boards &&
+									activeBoardId &&
+									boards.find((board) => board.id === activeBoardId)?.title}
+
 								<Icon icon="bi:caret-down-fill" className="ml-2" />
 							</label>
 							<ul
 								tabIndex={0}
 								className="p-2 shadow menu dropdown-content bg-base-200 w-max rounded-md"
 							>
-								{status === "loading" ? (
-									<li>Loading...</li>
-								) : (
-									boards?.map((board) => {
+								{boards
+									?.filter((board) => board.id !== activeBoardId)
+									.map((board) => {
 										return (
-											<Link href={`/app/board/${board.id}`} key={board.id}>
-												<a className="btn btn-ghost">{board.title}</a>
-											</Link>
+											<button
+												key={board.id}
+												onClick={() => setActiveBoardId?.(board.id)}
+												className="btn btn-ghost"
+											>
+												{board.title}
+											</button>
 										);
-									})
-								)}
+									})}
 							</ul>
-						</div>
-					</div>
-				)}
+						</>
+					)}
+				</div>
 			</div>
+
 			<div className="dropdown dropdown-end">
 				<label
 					tabIndex={0}

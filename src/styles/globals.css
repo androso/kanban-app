@@ -3,17 +3,30 @@
 @tailwind utilities;
 html,
 body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	padding: 0;
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 a {
-  color: inherit;
-  text-decoration: none;
+	color: inherit;
+	text-decoration: none;
 }
 
 * {
-  box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+@media (min-width: 768px) {
+	.drawer {
+		grid-auto-columns: max-content auto;
+	}
+	.drawer-mobile > .drawer-toggle ~ .drawer-content {
+		grid-column-start: 2;
+	}
+	.drawer-mobile > .drawer-toggle ~ .drawer-side > .drawer-overlay + * {
+		grid-column-start: 1;
+		transform: translateX(0px);
+	}
 }
