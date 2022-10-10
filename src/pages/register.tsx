@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import PageContainer from "../components/Layout/PageContainer";
 import { useAuth } from "../lib/hooks/useAuth";
 import useRedirectIfAuthorized from "../lib/hooks/useRedirectIfAuthorized";
 
@@ -23,7 +24,7 @@ export default function Register() {
 		}
 	};
 	return (
-		<div className="w-full h-[100vh] flex justify-center items-center">
+		<PageContainer extraCss="flex justify-center items-center">
 			<div className="card card-normal bg-base-300 shadow-lg max-w-lg">
 				<form className="card-body" onSubmit={registerUser}>
 					<div className="card-title">
@@ -85,6 +86,6 @@ export default function Register() {
 					</div>
 				</form>
 			</div>
-		</div>
+		</PageContainer>
 	);
 }

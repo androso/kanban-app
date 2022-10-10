@@ -6,11 +6,18 @@ module.exports = {
     "./src/components/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+
+    },
   },
   plugins: [require("@tailwindcss/typography"), require("daisyui")],
   daisyui: {
-    themes: ['dark'],
-    darkTheme: 'dark',
+    themes: [{
+      dark: {
+        ...require("daisyui/src/colors/themes")["[data-theme=dark]"],
+
+        "primary": "#645fc6"
+      }
+    }],
   }
 }

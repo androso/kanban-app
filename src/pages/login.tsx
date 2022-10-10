@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../components/LoadingSpinner";
-import PageContainer from "../components/PageContainer";
+import PageContainer from "../components/Layout/PageContainer";
 
 import { useAuth } from "../lib/hooks/useAuth";
 import useRedirectIfAuthorized from "../lib/hooks/useRedirectIfAuthorized";
@@ -28,7 +28,7 @@ export default function Login() {
 	};
 
 	return (
-		<PageContainer>
+		<PageContainer extraCss="flex justify-center items-center">
 			{status === "loading" ? (
 				<LoadingSpinner />
 			) : (
