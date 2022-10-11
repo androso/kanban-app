@@ -2,11 +2,9 @@ import { ErrorMessage } from "@hookform/error-message";
 import { Icon } from "@iconify/react";
 import React from "react";
 import { useForm } from "react-hook-form";
-
-interface NewBoardFormTypes {
-	title: string;
-	description: string;
-}
+import { useActiveBoardId } from "../lib/context/activeBoardId";
+import { useCreateBoard } from "../lib/hooks/boards";
+import { NewBoardFormTypes } from "../lib/types";
 
 export default function NewBoardForm({
 	closeUpperModal,
@@ -15,14 +13,21 @@ export default function NewBoardForm({
 }) {
 	const {
 		register,
-		control,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<NewBoardFormTypes>({});
-
-	const submitForm = (data: unknown) => {
-		console.log(data);
+	const { mutate: createBoard, status, data } = useCreateBoard();
+	const submitForm = async (data: NewBoardFormTypes) => {
+		createBoard(data);
 	};
+	const { setActiveBoardId } = useActiveBoardId();
+
+	React.useEffect(() => {
+		if (status === "success" && data && closeUpperModal) {
+			setActiveBoardId(data.id);
+			closeUpperModal();
+		}
+	}, [status, data, closeUpperModal, setActiveBoardId]);
 
 	return (
 		<form
@@ -49,7 +54,7 @@ export default function NewBoardForm({
 					type="text"
 					{...register("title", { required: "This field is required" })}
 					id="title"
-					placeholder="e.g Take coffee break"
+					placeholder="e.g tea with the queen"
 					className="input input-bordered"
 				/>
 				<label className="label" htmlFor="title">
@@ -64,7 +69,7 @@ export default function NewBoardForm({
 				</label>
 				<textarea
 					{...register("description", { required: "This field is required" })}
-					placeholder="e.g Take coffee break"
+					placeholder="e.g be kind with her bc she angry"
 					id="description"
 					className="textarea textarea-bordered"
 				></textarea>
@@ -74,9 +79,18 @@ export default function NewBoardForm({
 					</span>
 				</label>
 			</div>
-			<button type="submit" className="btn btn-primary w-full max-w-xs">
-				Create
-			</button>
+			{status === "loading" ? (
+				<button
+					type="submit"
+					className="btn btn-primary loading w-full max-w-xs"
+				>
+					Creating
+				</button>
+			) : (
+				<button type="submit" className="btn btn-primary w-full max-w-xs">
+					Create
+				</button>
+			)}
 		</form>
 	);
 }

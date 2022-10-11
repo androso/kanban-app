@@ -17,3 +17,14 @@ export interface NewTaskFormTypes {
 	description: string;
 	status: number;
 }
+
+export interface NewBoardFormTypes {
+	title: string;
+	description: string;
+}
+export type Board = {
+	created_at: string;
+	description: string;
+	id: number;
+	title: string;
+};

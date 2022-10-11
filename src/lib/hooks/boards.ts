@@ -1,5 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { client, customTimePause } from "../helpers";
+import { queryClient } from "../../pages/_app";
+
+import { client } from "../helpers";
+import { Board, NewBoardFormTypes } from "../types";
 
 const fakeBoards = [
 	{
@@ -24,17 +27,23 @@ const fakeBoards = [
 
 export const useBoards = () => {
 	const { data: boards, status } = useQuery(["userBoards"], async () => {
-		// await client("/boards");
-		await customTimePause(1000);
-
-		return fakeBoards;
+		const boards = await client("/user/boards") as Board[];
+		return boards;
 	});
 
 	return { boards, status };
 };
 
 export const useCreateBoard = () => {
-	return useMutation((newBoard) => {
-		return client("/boards", { body: JSON.stringify(newBoard) });
-	});
+	return useMutation(
+		(newBoard: NewBoardFormTypes) => {
+			return client("/user/boards", { body: JSON.stringify(newBoard) });
+		},
+		{
+			onSuccess: (data, variables) => {
+				queryClient.invalidateQueries(["userBoards"]);
+				console.log("board created succesfully!", data);
+			},
+		}
+	);
 };
