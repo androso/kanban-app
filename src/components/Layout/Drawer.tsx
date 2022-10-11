@@ -1,9 +1,9 @@
 import { useBoards } from "../../lib/hooks/boards";
 import { Dialog } from "@reach/dialog";
 import "@reach/dialog/styles.css";
-import NewTaskForm from "../NewTaskForm";
+
 import { useDialog } from "../../lib/hooks/useDialog";
-import { Icon } from "@iconify/react";
+
 import NewBoardForm from "../NewBoardForm";
 
 export default function Drawer({
@@ -23,7 +23,7 @@ export default function Drawer({
 			<div className="drawer drawer-mobile z-0">
 				<span className="drawer-toggle"></span>
 				<div className="drawer-content">{children}</div>
-				<div className="drawer-side">
+				<div className="drawer-side md:z-0">
 					<label htmlFor="my-drawer-2" className="drawer-overlay"></label>
 					<ul className="menu p-4 overflow-y-auto bg-base-300 text-base-content max-w-[16rem] w-fit">
 						<div className="prose">
@@ -58,7 +58,7 @@ export default function Drawer({
 				className="!bg-base-100 max-w-md rounded-md relative"
 				aria-label="Create new board"
 			>
-				<NewBoardForm closeUpperModal={closeDialog}/>
+				<NewBoardForm closeUpperModal={closeDialog} />
 			</Dialog>
 		</div>
 	);
