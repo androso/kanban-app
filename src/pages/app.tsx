@@ -10,6 +10,12 @@ import {
 	ActiveBoardIdProvider,
 	useActiveBoardId,
 } from "../lib/context/activeBoardId";
+import { Icon } from "@iconify/react";
+import Dialog, { DialogOverlay } from "@reach/dialog";
+import { useDialog } from "../lib/hooks/useDialog";
+import { useState } from "react";
+import NewBoardForm from "../components/NewBoardForm";
+import NewTaskForm from "../components/NewTaskForm";
 
 export default function AppWrapper() {
 	return (
@@ -37,6 +43,11 @@ function App() {
 	// if it's null, means user dosn't have any boards created.
 	// const [activeBoardId, setActiveBoardId] = useState<number | null>(null);
 	const { activeBoardId, setActiveBoardId } = useActiveBoardId();
+	const activeBoard = boards?.find((board) => board.id === activeBoardId);
+	const { showDialog, openDialog, closeDialog } = useDialog();
+	const [dialogAction, setDialogAction] = useState<
+		"newTask" | "newBoard" | null
+	>(null);
 
 	return (
 		<PageContainer>
@@ -53,8 +64,60 @@ function App() {
 					/>
 					<h1>hello {user.email}</h1>
 					<p>
-						You{`'`}re currently using board: {activeBoardId}
+						You{`'`}re currently using board:
+						<br />
+						title: {activeBoard?.title} <br />
+						id: {activeBoardId}
+						<br />
+						description: {activeBoard?.description}
 					</p>
+
+					<div className="dropdown dropdown-top dropdown-left absolute bottom-6 right-6 md:hidden">
+						<label
+							tabIndex={0}
+							className="btn btn-circle bg-primary hover:bg-primary-focus focus:bg-primary-focus m-1 text-3xl text-primary-content w-16 h-16"
+						>
+							<Icon icon="fa6-solid:plus" />
+						</label>
+						<ul
+							tabIndex={0}
+							className="dropdown-content menu p-2 bg-primary text-primary-content shadow rounded-box w-52"
+						>
+							<li>
+								<button
+									onClick={() => {
+										openDialog();
+										setDialogAction("newBoard");
+									}}
+								>
+									Create Board
+								</button>
+							</li>
+							<li>
+								<button
+									onClick={() => {
+										openDialog();
+										setDialogAction("newTask");
+									}}
+								>
+									Create Task
+								</button>
+							</li>
+						</ul>
+					</div>
+
+					<Dialog
+						isOpen={showDialog}
+						onDismiss={closeDialog}
+						className="!bg-base-100 !w-[90vw] rounded-md relative"
+						aria-label="Create new board"
+					>
+						{dialogAction === "newBoard" ? (
+							<NewBoardForm closeUpperModal={closeDialog} />
+						) : (
+							<NewTaskForm closeUpperModal={closeDialog} />
+						)}
+					</Dialog>
 				</Drawer>
 			) : null}
 		</PageContainer>

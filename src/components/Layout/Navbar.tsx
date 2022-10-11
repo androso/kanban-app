@@ -2,11 +2,11 @@ import Link from "next/link";
 import React from "react";
 import { useAuth } from "../../lib/hooks/useAuth";
 import Image from "next/image";
-import { useBoards } from "../../lib/hooks/boards";
+import { useActiveBoard, useBoards } from "../../lib/hooks/boards";
 import { Icon } from "@iconify/react";
+import { useDialog } from "../../lib/hooks/useDialog";
 
 // navigation bar + sidebar (desktop)
-
 
 export default function Navbar({
 	activeBoardId,
@@ -17,7 +17,7 @@ export default function Navbar({
 }) {
 	const { logout } = useAuth();
 	const { boards, status } = useBoards();
-
+	const { activeBoard } = useActiveBoard();
 	return (
 		<div className="navbar flex md:justify-end items-center justify-between bg-[#242933] ">
 			<div className="flex-1  md:hidden">
@@ -26,12 +26,8 @@ export default function Navbar({
 						<label className="btn btn-ghost">...</label>
 					) : (
 						<>
-							<label tabIndex={0} className="btn btn-ghost">
-								{status === "success" &&
-									boards &&
-									activeBoardId &&
-									boards.find((board) => board.id === activeBoardId)?.title}
-
+							<label tabIndex={0} className="btn btn-ghost text-purple-400">
+								{activeBoard?.title}
 								<Icon icon="bi:caret-down-fill" className="ml-2" />
 							</label>
 							<ul

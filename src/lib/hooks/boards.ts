@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../../pages/_app";
+import { useActiveBoardId } from "../context/activeBoardId";
 
 import { client } from "../helpers";
 import { Board, NewBoardFormTypes } from "../types";
@@ -27,11 +28,17 @@ const fakeBoards = [
 
 export const useBoards = () => {
 	const { data: boards, status } = useQuery(["userBoards"], async () => {
-		const boards = await client("/user/boards") as Board[];
+		const boards = (await client("/user/boards")) as Board[];
 		return boards;
 	});
 
 	return { boards, status };
+};
+
+export const useActiveBoard = () => {
+	const { activeBoardId } = useActiveBoardId();
+	const { boards } = useBoards();
+	return { activeBoard: boards?.find((board) => board.id === activeBoardId) };
 };
 
 export const useCreateBoard = () => {
