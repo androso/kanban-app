@@ -3,6 +3,7 @@ import { Dialog } from "@reach/dialog";
 import "@reach/dialog/styles.css";
 import NewTaskForm from "../NewTaskForm";
 import { useDialog } from "../../lib/hooks/useDialog";
+import { Icon } from "@iconify/react";
 
 export default function Drawer({
 	children,
@@ -53,10 +54,10 @@ export default function Drawer({
 			<Dialog
 				isOpen={showDialog}
 				onDismiss={closeDialog}
-				className="!bg-base-100"
+				className="!bg-base-100 max-w-md rounded-md relative"
 				aria-label="Create new board"
 			>
-				<NewTaskForm />
+				<NewTaskForm closeUpperModal={closeDialog}/>
 			</Dialog>
 		</div>
 	);

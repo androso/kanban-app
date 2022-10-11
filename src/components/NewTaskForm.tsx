@@ -3,7 +3,11 @@ import { ErrorMessage } from "@hookform/error-message";
 import { Icon } from "@iconify/react";
 import type { NewTaskFormTypes } from "../lib/types";
 
-export default function NewTaskForm() {
+export default function NewTaskForm({
+	closeUpperModal,
+}: {
+	closeUpperModal?: () => void;
+}) {
 	const {
 		register,
 		control,
@@ -30,7 +34,18 @@ export default function NewTaskForm() {
 			className="prose max-w-xs mx-auto"
 			onSubmit={handleSubmit(submitForm)}
 		>
-			<h2 className="mb-4 text-primary-content">Add New Task</h2>
+			<div className="mb-4 flex justify-between items-center">
+				<h2 className="!m-0 text-primary-content">Add New Task</h2>
+				{closeUpperModal && (
+					<button
+						type="button"
+						onClick={closeUpperModal}
+						className="btn-ghost p-3 rounded-md transition-all"
+					>
+						<Icon icon="bi:x-circle" />
+					</button>
+				)}
+			</div>
 			<div className="form-control w-full max-w-xs">
 				<label className="label" htmlFor="title">
 					<span className="label-text">Title</span>
@@ -49,12 +64,13 @@ export default function NewTaskForm() {
 				</label>
 			</div>
 			<div className="form-control w-full max-w-xs">
-				<label className="label">
+				<label className="label" htmlFor="description">
 					<span className="label-text">Description</span>
 				</label>
 				<textarea
 					{...register("description", { required: "This field is required" })}
 					placeholder="e.g Take coffee break"
+					id="description"
 					className="textarea textarea-bordered"
 				></textarea>
 				<label className="label" htmlFor="description">
@@ -63,7 +79,7 @@ export default function NewTaskForm() {
 					</span>
 				</label>
 			</div>
-			<div className="form-control w-full max-w-xs">
+			<div className="form-control w-full max-w-xs mb-4">
 				<label className="label">
 					<span className="label-text">Subtasks</span>
 				</label>
@@ -78,24 +94,26 @@ export default function NewTaskForm() {
 									})}
 									id={`subtasks.${index}.title`}
 									placeholder="e.g Take coffee break"
-									className="input input-bordered w-full rounded-r-none"
+									className="input input-bordered focus:outline-offset-0 w-full rounded-r-none"
 								/>
 								<button
 									type="button"
-									className="btn btn-ghost rounded-l-none"
+									className="btn btn-ghost rounded-l-none btn-outline"
 									onClick={() => remove(index)}
 								>
 									<Icon icon="bi:x-circle" />
 								</button>
 							</div>
-							<label className="label" htmlFor={`subtasks.${index}.title`}>
-								<span className="label-text text-error">
-									<ErrorMessage
-										errors={errors}
-										name={`subtasks.${index}.title`}
-									/>
-								</span>
-							</label>
+							{errors.subtasks && (errors.subtasks as [])?.at(index) && (
+								<label className="label" htmlFor={`subtasks.${index}.title`}>
+									<span className="label-text text-error">
+										<ErrorMessage
+											errors={errors}
+											name={`subtasks.${index}.title`}
+										/>
+									</span>
+								</label>
+							)}
 						</div>
 					);
 				})}

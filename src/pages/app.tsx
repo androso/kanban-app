@@ -12,7 +12,6 @@ import Drawer from "../components/Layout/Drawer";
 export default function App() {
 	// if user is not logged in, redirect to /login
 	// if user is logged in, allow them access.
-
 	const { user, status } = useProtectedRoute();
 	const { logout } = useAuth();
 	const closeSession = async () => {
