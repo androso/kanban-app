@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { customTimePause } from "../helpers";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { client, customTimePause } from "../helpers";
 
 const fakeBoards = [
 	{
@@ -31,4 +31,10 @@ export const useBoards = () => {
 	});
 
 	return { boards, status };
+};
+
+export const useCreateBoard = () => {
+	return useMutation((newBoard) => {
+		return client("/boards", { body: JSON.stringify(newBoard) });
+	});
 };
