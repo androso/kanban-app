@@ -1,12 +1,17 @@
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../../lib/hooks/useAuth";
 import Image from "next/image";
-import { useActiveBoard, useBoards } from "../../lib/hooks/boards";
+import {
+	useActiveBoard,
+	useBoards,
+	useDeleteBoard,
+} from "../../lib/hooks/boards";
 import { Icon } from "@iconify/react";
 import { useDialog } from "../../lib/hooks/useDialog";
 import Dialog from "@reach/dialog";
 import NewTaskForm from "../NewTaskForm";
+import toast from "react-hot-toast";
 
 // navigation bar + sidebar (desktop)
 
@@ -21,6 +26,16 @@ export default function Navbar({
 	const { boards, status } = useBoards();
 	const { activeBoard } = useActiveBoard();
 	const { showDialog, openDialog, closeDialog } = useDialog();
+	const [dialogCategory, setDialogCategory] = useState<
+		"deleteBoardAlert" | "newTask" | "editBoard" | null
+	>(null);
+	const [showDropdown, setShowDropdown] = useState(false);
+	const {
+		mutateAsync: deleteBoardAsync,
+		boardToDelete,
+		setBoardToDelete,
+	} = useDeleteBoard();
+
 	return (
 		<>
 			<div className="navbar flex md:justify-end items-center justify-between bg-[#242933] ">
@@ -31,17 +46,40 @@ export default function Navbar({
 						) : (
 							<>
 								{activeBoard && (
-									<label tabIndex={0} className="btn btn-ghost text-purple-400">
+									<label
+										className="btn btn-ghost text-purple-400"
+										onClick={() => {
+											if (boards && boards.length > 1) {
+												setShowDropdown(!showDropdown);
+											}
+										}}
+									>
 										{activeBoard.title}
-										{boards && boards.length > 1 && (
-											<Icon icon="bi:caret-down-fill" className="ml-2" />
-										)}
+
+										<>
+											{boards && boards.length > 1 && (
+												<Icon icon="bi:caret-down-fill" className="ml-2" />
+											)}
+
+											<span
+												onClick={(e) => {
+													e.stopPropagation();
+													openDialog();
+													setDialogCategory("deleteBoardAlert");
+													setBoardToDelete(activeBoard.id);
+												}}
+												className="btn-ghost p-1 rounded-md transition-colors hover:bg-error hover:text-primary-content ml-1"
+											>
+												<Icon icon="fe:trash" />
+											</span>
+										</>
 									</label>
 								)}
-								{boards && boards.length > 1 && (
+								{boards && boards.length > 1 && showDropdown && (
 									<ul
-										tabIndex={0}
-										className="p-2 shadow menu dropdown-content bg-base-200 w-max rounded-md"
+										className={`${
+											showDropdown && "!visible !opacity-100"
+										} p-2 shadow menu dropdown-content bg-base-200 w-max rounded-md !text-left`}
 									>
 										{boards
 											?.filter((board) => board.id !== activeBoardId)
@@ -50,9 +88,20 @@ export default function Navbar({
 													<button
 														key={board.id}
 														onClick={() => setActiveBoardId?.(board.id)}
-														className="btn btn-ghost"
+														className="btn btn-ghost !text-left"
 													>
 														{board.title}
+														<span
+															onClick={(e) => {
+																e.stopPropagation();
+																openDialog();
+																setDialogCategory("deleteBoardAlert");
+																setBoardToDelete(board.id);
+															}}
+															className="btn-ghost p-1 rounded-md transition-colors hover:bg-error hover:text-primary-content ml-2"
+														>
+															<Icon icon="fe:trash" />
+														</span>
 													</button>
 												);
 											})}
@@ -110,7 +159,36 @@ export default function Navbar({
 				className="!bg-base-100 max-w-md rounded-md relative"
 				aria-label="Create new board"
 			>
-				<NewTaskForm closeUpperModal={closeDialog} />
+				{dialogCategory === "deleteBoardAlert" ? (
+					<div className=" prose">
+						<h4 className="mb-4">
+							Are you sure you want to delete this board?
+						</h4>
+						<div className="flex justify-end">
+							<button className="btn btn-ghost mr-2" onClick={closeDialog}>
+								Cancel
+							</button>
+							<button
+								className={`btn btn-error ${status === "loading" && "loading"}`}
+								onClick={async () => {
+									if (boardToDelete) {
+										try {
+											const s = await deleteBoardAsync(boardToDelete);
+											closeDialog();
+										} catch (e) {
+											console.error(e);
+											toast.error("Error while deleting board");
+										}
+									}
+								}}
+							>
+								Delete
+							</button>
+						</div>
+					</div>
+				) : (
+					<NewTaskForm closeUpperModal={closeDialog} />
+				)}
 			</Dialog>
 		</>
 	);
