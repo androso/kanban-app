@@ -19,7 +19,7 @@ const Home: NextPage = () => {
 				<Link href="/login">
 					<a className="btn btn-primary mb-4">Sign in</a>
 				</Link>
-				<Link href="/login">
+				<Link href="/register">
 					<a className="btn btn-secondary">Register</a>
 				</Link>
 			</main>

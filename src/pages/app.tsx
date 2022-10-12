@@ -11,11 +11,12 @@ import {
 	useActiveBoardId,
 } from "../lib/context/activeBoardId";
 import { Icon } from "@iconify/react";
-import Dialog, { DialogOverlay } from "@reach/dialog";
+import Dialog from "@reach/dialog";
 import { useDialog } from "../lib/hooks/useDialog";
 import { useState } from "react";
 import NewBoardForm from "../components/NewBoardForm";
 import NewTaskForm from "../components/NewTaskForm";
+import { DndContext } from "@dnd-kit/core";
 
 export default function AppWrapper() {
 	return (
@@ -62,15 +63,7 @@ function App() {
 						activeBoardId={activeBoardId}
 						setActiveBoardId={setActiveBoardId}
 					/>
-					<h1>hello {user.email}</h1>
-					<p>
-						You{`'`}re currently using board:
-						<br />
-						title: {activeBoard?.title} <br />
-						id: {activeBoardId}
-						<br />
-						description: {activeBoard?.description}
-					</p>
+					<DndContext></DndContext>
 
 					<div className="dropdown dropdown-top dropdown-left absolute bottom-6 right-6 md:hidden">
 						<label
@@ -93,23 +86,25 @@ function App() {
 									Create Board
 								</button>
 							</li>
-							<li>
-								<button
-									onClick={() => {
-										openDialog();
-										setDialogAction("newTask");
-									}}
-								>
-									Create Task
-								</button>
-							</li>
+							{activeBoard && (
+								<li>
+									<button
+										onClick={() => {
+											openDialog();
+											setDialogAction("newTask");
+										}}
+									>
+										Create Task
+									</button>
+								</li>
+							)}
 						</ul>
 					</div>
 
 					<Dialog
 						isOpen={showDialog}
 						onDismiss={closeDialog}
-						className="!bg-base-100 !w-[90vw] rounded-md relative"
+						className="!bg-base-100 !w-[90vw] max-w-[490px] rounded-md relative"
 						aria-label="Create new board"
 					>
 						{dialogAction === "newBoard" ? (

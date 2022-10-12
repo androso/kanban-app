@@ -30,33 +30,46 @@ export default function Navbar({
 							<label className="btn btn-ghost">...</label>
 						) : (
 							<>
-								<label tabIndex={0} className="btn btn-ghost text-purple-400">
-									{activeBoard?.title}
-									<Icon icon="bi:caret-down-fill" className="ml-2" />
-								</label>
-								<ul
-									tabIndex={0}
-									className="p-2 shadow menu dropdown-content bg-base-200 w-max rounded-md"
-								>
-									{boards
-										?.filter((board) => board.id !== activeBoardId)
-										.map((board) => {
-											return (
-												<button
-													key={board.id}
-													onClick={() => setActiveBoardId?.(board.id)}
-													className="btn btn-ghost"
-												>
-													{board.title}
-												</button>
-											);
-										})}
-								</ul>
+								{activeBoard && (
+									<label tabIndex={0} className="btn btn-ghost text-purple-400">
+										{activeBoard.title}
+										{boards && boards.length > 1 && (
+											<Icon icon="bi:caret-down-fill" className="ml-2" />
+										)}
+									</label>
+								)}
+								{boards && boards.length > 1 && (
+									<ul
+										tabIndex={0}
+										className="p-2 shadow menu dropdown-content bg-base-200 w-max rounded-md"
+									>
+										{boards
+											?.filter((board) => board.id !== activeBoardId)
+											.map((board) => {
+												return (
+													<button
+														key={board.id}
+														onClick={() => setActiveBoardId?.(board.id)}
+														className="btn btn-ghost"
+													>
+														{board.title}
+													</button>
+												);
+											})}
+									</ul>
+								)}
 							</>
 						)}
 					</div>
 				</div>
-				<button className="btn btn-primary mr-3 hidden md:block" onClick={openDialog}>+ New Task</button>
+				{activeBoard && (
+					<button
+						className="btn btn-primary mr-3 hidden md:block"
+						onClick={openDialog}
+					>
+						+ New Task
+					</button>
+				)}
 				<div className="dropdown dropdown-end">
 					<label
 						tabIndex={0}

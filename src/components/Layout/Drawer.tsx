@@ -41,11 +41,11 @@ export default function Drawer({
 									onClick={() => setActiveBoardId?.(board.id)}
 									className={`${
 										activeBoardId === board.id ? "bg-primary text-white" : ""
-									} mb-1 flex justify-between group  `}
+									} mb-1 flex justify-between group`}
 								>
 									<span className="py-1">{board.title}</span>
 									<div
-										className=" hidden group-hover:flex transition-all"
+										className="invisible flex group-hover:visible  transition-all"
 										onClick={(e) => {
 											e.stopPropagation();
 										}}

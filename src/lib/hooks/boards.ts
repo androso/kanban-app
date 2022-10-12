@@ -67,9 +67,12 @@ export const useDeleteBoard = () => {
 			onSuccess: (_, boardId) => {
 				queryClient.invalidateQueries(["userBoards"]);
 				console.log({ boardId });
-				if (boards) {
+				if (boards && boards.length >= 2) {
 					const newBoards = boards.filter((board) => board.id !== boardId);
 					setActiveBoardId(newBoards[0].id);
+				} else if (boards && boards.length === 1) {
+					// deleting the only board
+					window.localStorage.removeItem("activeBoardId");
 				}
 			},
 			onError: (error) => {
