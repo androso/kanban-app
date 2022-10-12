@@ -95,14 +95,17 @@ export const useEditBoard = () => {
 	const { boards } = useBoards();
 	const mutate = useMutation(
 		(board: Board) => {
-			return client(`/user/boards/${board.id}`, {
-				body: JSON.stringify(board),
-			});
+			return client(
+				`/user/boards/${board.id}`,
+				{
+					body: JSON.stringify(board),
+				},
+				"PUT"
+			);
 		},
 		{
-			onSuccess: (data, variables) => {
+			onSuccess: () => {
 				queryClient.invalidateQueries(["userBoards"]);
-				console.log("board edited succesfully!", data);
 			},
 		}
 	);
@@ -122,5 +125,5 @@ export const useEditBoard = () => {
 		}
 	};
 
-	return mutate;
+	return { ...mutate, editBoardById };
 };

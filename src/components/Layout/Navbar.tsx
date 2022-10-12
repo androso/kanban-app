@@ -6,12 +6,17 @@ import {
 	useActiveBoard,
 	useBoards,
 	useDeleteBoard,
+	useEditBoard,
 } from "../../lib/hooks/boards";
 import { Icon } from "@iconify/react";
 import { useDialog } from "../../lib/hooks/useDialog";
 import Dialog from "@reach/dialog";
 import NewTaskForm from "../NewTaskForm";
 import toast from "react-hot-toast";
+import { useForm } from "react-hook-form";
+
+import { Board, BoardFormTypes } from "../../lib/types";
+import BoardFormFields from "../BoardFormFields";
 
 // navigation bar + sidebar (desktop)
 
@@ -29,7 +34,10 @@ export default function Navbar({
 	const [dialogCategory, setDialogCategory] = useState<
 		"deleteBoardAlert" | "newTask" | "editBoard" | null
 	>(null);
+
 	const [showDropdown, setShowDropdown] = useState(false);
+	const [boardToEdit, setBoardToEdit] = useState<Board | null>(null);
+
 	const {
 		mutateAsync: deleteBoardAsync,
 		boardToDelete,
@@ -62,19 +70,32 @@ export default function Navbar({
 											)}
 
 											<span
+												className="btn-ghost p-1 rounded-md ml-1"
+												onClick={(e) => {
+													e.stopPropagation();
+													setDialogCategory("editBoard");
+													setBoardToEdit(activeBoard);
+													openDialog();
+												}}
+											>
+												<Icon icon="icon-park-outline:pencil" />
+											</span>
+											<span
 												onClick={(e) => {
 													e.stopPropagation();
 													openDialog();
 													setDialogCategory("deleteBoardAlert");
 													setBoardToDelete(activeBoard.id);
 												}}
-												className="btn-ghost p-1 rounded-md transition-colors hover:bg-error hover:text-primary-content ml-1"
+												className="btn-ghost p-1 rounded-md transition-colors hover:bg-error hover:text-primary-content"
 											>
 												<Icon icon="fe:trash" />
 											</span>
 										</>
 									</label>
 								)}
+
+								{/* TODO: we could render a DialogOverlay here? */}
 								{boards && boards.length > 1 && showDropdown && (
 									<ul
 										className={`${
@@ -91,6 +112,18 @@ export default function Navbar({
 														className="btn btn-ghost !text-left"
 													>
 														{board.title}
+
+														<span
+															className="btn-ghost p-1 rounded-md ml-1"
+															onClick={(e) => {
+																e.stopPropagation();
+																setBoardToEdit(board);
+																setDialogCategory("editBoard");
+																openDialog();
+															}}
+														>
+															<Icon icon="icon-park-outline:pencil" />
+														</span>
 														<span
 															onClick={(e) => {
 																e.stopPropagation();
@@ -98,7 +131,7 @@ export default function Navbar({
 																setDialogCategory("deleteBoardAlert");
 																setBoardToDelete(board.id);
 															}}
-															className="btn-ghost p-1 rounded-md transition-colors hover:bg-error hover:text-primary-content ml-2"
+															className="btn-ghost p-1 rounded-md transition-colors hover:bg-error hover:text-primary-content"
 														>
 															<Icon icon="fe:trash" />
 														</span>
@@ -186,10 +219,54 @@ export default function Navbar({
 							</button>
 						</div>
 					</div>
+				) : dialogCategory === "editBoard" ? (
+					<EditBoardForm
+						closeUpperModal={closeDialog}
+						boardToEdit={boardToEdit}
+					/>
 				) : (
 					<NewTaskForm closeUpperModal={closeDialog} />
 				)}
 			</Dialog>
 		</>
+	);
+}
+// TODO: abstract a boardFormFields component to be used in Edit and New
+function EditBoardForm({
+	boardToEdit,
+	closeUpperModal,
+}: {
+	boardToEdit: Board | null;
+	closeUpperModal: () => void;
+}) {
+	// here we're gonna use the hook
+	const { mutateAsync } = useEditBoard();
+
+	const form = useForm<BoardFormTypes>({
+		defaultValues: {
+			description: boardToEdit?.description || "",
+			title: boardToEdit?.title || "",
+		},
+	});
+
+	const submitForm = async (data: BoardFormTypes) => {
+		try {
+			if (boardToEdit) {
+				await mutateAsync({
+					...boardToEdit,
+					description: data.description,
+					title: data.title,
+				});
+				closeUpperModal();
+			}
+		} catch (e) {
+			toast.error("Error while editing board");
+		}
+	};
+
+	return (
+		<form onSubmit={form.handleSubmit(submitForm)}>
+			<BoardFormFields formMethods={form} mode="Edit" />
+		</form>
 	);
 }
