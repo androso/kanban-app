@@ -9,7 +9,7 @@ export const client = async (
 	const headers = { "Content-Type": "application/json" };
 
 	let config: RequestInit = {
-		method: body ? "POST" : method,
+		method: body && method === "GET" ? "POST" : method,
 		...customConfig,
 		credentials: "include",
 		headers: {
@@ -17,6 +17,7 @@ export const client = async (
 			...customConfig.headers,
 		},
 	};
+	
 	if (body) {
 		config.body = body;
 	}
