@@ -18,7 +18,7 @@ export interface NewTaskFormTypes {
 	status: number;
 }
 
-export interface NewBoardFormTypes {
+export interface BoardFormTypes {
 	title: string;
 	description: string;
 }

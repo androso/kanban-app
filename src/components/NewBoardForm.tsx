@@ -4,7 +4,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { useActiveBoardId } from "../lib/context/activeBoardId";
 import { useCreateBoard } from "../lib/hooks/boards";
-import { NewBoardFormTypes } from "../lib/types";
+import { BoardFormTypes } from "../lib/types";
 
 export default function NewBoardForm({
 	closeUpperModal,
@@ -15,9 +15,9 @@ export default function NewBoardForm({
 		register,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<NewBoardFormTypes>({});
+	} = useForm<BoardFormTypes>({});
 	const { mutate: createBoard, status, data } = useCreateBoard();
-	const submitForm = async (data: NewBoardFormTypes) => {
+	const submitForm = async (data: BoardFormTypes) => {
 		createBoard(data);
 	};
 	const { setActiveBoardId } = useActiveBoardId();

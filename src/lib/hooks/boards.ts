@@ -5,7 +5,7 @@ import { queryClient } from "../../pages/_app";
 import { useActiveBoardId } from "../context/activeBoardId";
 
 import { client } from "../helpers";
-import { Board, NewBoardFormTypes } from "../types";
+import { Board, BoardFormTypes } from "../types";
 
 const fakeBoards = [
 	{
@@ -45,7 +45,7 @@ export const useActiveBoard = () => {
 
 export const useCreateBoard = () => {
 	return useMutation(
-		(newBoard: NewBoardFormTypes) => {
+		(newBoard: BoardFormTypes) => {
 			return client("/user/boards", { body: JSON.stringify(newBoard) });
 		},
 		{
@@ -89,4 +89,38 @@ export const useDeleteBoard = () => {
 		boardToDelete,
 		setBoardToDelete,
 	};
+};
+
+export const useEditBoard = () => {
+	const { boards } = useBoards();
+	const mutate = useMutation(
+		(board: Board) => {
+			return client(`/user/boards/${board.id}`, {
+				body: JSON.stringify(board),
+			});
+		},
+		{
+			onSuccess: (data, variables) => {
+				queryClient.invalidateQueries(["userBoards"]);
+				console.log("board edited succesfully!", data);
+			},
+		}
+	);
+
+	const editBoardById = async (
+		newTitle: string,
+		newDescription: string,
+		boardId: number
+	) => {
+		const board = boards?.find((board) => board.id === boardId);
+		if (board) {
+			return mutate.mutateAsync({
+				...board,
+				title: newTitle,
+				description: newDescription,
+			});
+		}
+	};
+
+	return mutate;
 };
