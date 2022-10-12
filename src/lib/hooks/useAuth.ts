@@ -17,7 +17,8 @@ export const useAuth = () => {
 		})) as User;
 		// update stored user data
 		updateUser(user);
-		router.push("/app", undefined, { shallow: true });
+		// We don't need to push the router, useRedirectIfAuthorized will do it automatically :)
+		// router.push("/app", undefined, { shallow: true });
 	};
 
 	const register = async (
