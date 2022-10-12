@@ -56,13 +56,21 @@ export const useCreateBoard = () => {
 	);
 };
 export const useDeleteBoard = () => {
+	const { setActiveBoardId } = useActiveBoardId();
+	const { boards } = useBoards();
+
 	return useMutation(
 		(boardId: number) => {
 			return client(`/user/boards/${boardId}`, undefined, "DELETE");
 		},
 		{
-			onSuccess: () => {
+			onSuccess: (_, boardId) => {
 				queryClient.invalidateQueries(["userBoards"]);
+				console.log({ boardId });
+				if (boards) {
+					const newBoards = boards.filter((board) => board.id !== boardId);
+					setActiveBoardId(newBoards[0].id);
+				}
 			},
 			onError: (error) => {
 				if (error instanceof Error) {
