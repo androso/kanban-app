@@ -4,7 +4,7 @@ import "@reach/dialog/styles.css";
 import { useDialog } from "../../lib/hooks/useDialog";
 import NewBoardForm from "../NewBoardForm";
 import { Icon } from "@iconify/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
 
 export default function Drawer({
@@ -21,14 +21,8 @@ export default function Drawer({
 	const [dialogCategory, setDialogCategory] = useState<
 		"newBoard" | "deleteBoardAlert" | null
 	>(null);
-	const { mutate: deleteBoard, status } = useDeleteBoard();
+	const { status, mutateAsync: deleteBoardAsync } = useDeleteBoard();
 	const [boardToDelete, setBoardToDelete] = useState<number>();
-
-	useEffect(() => {
-		if (status === "success" && showDialog) {
-			closeDialog();
-		}
-	}, [status, showDialog, closeDialog]);
 
 	return (
 		<div>
@@ -75,7 +69,10 @@ export default function Drawer({
 						))}
 						<li className="">
 							<button
-								onClick={openDialog}
+								onClick={() => {
+									setDialogCategory("newBoard");
+									openDialog();
+								}}
 								className="!transition-colors !duration-500 hover:bg-secondary hover:text-white"
 							>
 								+ Create New Board
@@ -105,7 +102,13 @@ export default function Drawer({
 								className={`btn btn-error ${status === "loading" && "loading"}`}
 								onClick={async () => {
 									if (boardToDelete) {
-										deleteBoard(boardToDelete);
+										try {
+											const s = await deleteBoardAsync(boardToDelete);
+											closeDialog();
+										} catch (e) {
+											console.error(e);
+											toast.error("Error while deleting board");
+										}
 									}
 								}}
 							>
