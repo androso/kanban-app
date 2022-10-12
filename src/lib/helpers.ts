@@ -24,8 +24,11 @@ export const client = async (
 	let dataReturned;
 
 	const response = await window.fetch(`${API}${endpoint}`, config);
-
-	if (response.ok) {
+	// todo: should we return something like {message: string, status: number} from the server?
+	// todo if we don't, we shouldn't .json() the response.
+	if (response.status === 204) {
+		return response;
+	} else if (response.ok) {
 		dataReturned = await response.json();
 		return dataReturned;
 	} else if (response.status === 404) {
