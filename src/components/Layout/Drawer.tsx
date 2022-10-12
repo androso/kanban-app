@@ -21,8 +21,7 @@ export default function Drawer({
 	const [dialogCategory, setDialogCategory] = useState<
 		"newBoard" | "deleteBoardAlert" | null
 	>(null);
-	const { status, mutateAsync: deleteBoardAsync } = useDeleteBoard();
-	const [boardToDelete, setBoardToDelete] = useState<number>();
+	const { status, mutateAsync: deleteBoardAsync, boardToDelete, setBoardToDelete } = useDeleteBoard();
 
 	return (
 		<div>

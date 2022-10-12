@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import toast from "react-hot-toast";
 import { queryClient } from "../../pages/_app";
 import { useActiveBoardId } from "../context/activeBoardId";
@@ -58,8 +59,8 @@ export const useCreateBoard = () => {
 export const useDeleteBoard = () => {
 	const { setActiveBoardId } = useActiveBoardId();
 	const { boards } = useBoards();
-
-	return useMutation(
+	const [boardToDelete, setBoardToDelete] = useState<number | null>(null);
+	const mutate = useMutation(
 		(boardId: number) => {
 			return client(`/user/boards/${boardId}`, undefined, "DELETE");
 		},
@@ -82,4 +83,10 @@ export const useDeleteBoard = () => {
 			},
 		}
 	);
+
+	return {
+		...mutate,
+		boardToDelete,
+		setBoardToDelete,
+	};
 };
