@@ -28,9 +28,11 @@ export const client = async (
 	if (response.ok) {
 		dataReturned = await response.json();
 		return dataReturned;
+	} else if (response.status === 404) {
+		return Promise.reject(new Error(response.statusText));
 	} else {
-		const errorMessage = (await response.json()).message;
-		return Promise.reject(new Error(errorMessage));
+		const errorMessage = await response.json();
+		return Promise.reject(new Error(errorMessage.message));
 	}
 };
 

@@ -1,4 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { queryClient } from "../../pages/_app";
 import { useActiveBoardId } from "../context/activeBoardId";
 
@@ -50,6 +51,23 @@ export const useCreateBoard = () => {
 			onSuccess: (data, variables) => {
 				queryClient.invalidateQueries(["userBoards"]);
 				console.log("board created succesfully!", data);
+			},
+		}
+	);
+};
+export const useDeleteBoard = () => {
+	return useMutation(
+		(boardId: number) => {
+			return client(`/user/boards/${boardId}`, undefined, "DELETE");
+		},
+		{
+			onSuccess: () => {
+				queryClient.invalidateQueries(["userBoards"]);
+			},
+			onError: (error) => {
+				if (error instanceof Error) {
+					toast.error("Error while deleting board");
+				}
 			},
 		}
 	);
