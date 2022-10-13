@@ -29,11 +29,19 @@ const fakeBoards = [
 ];
 
 export const useBoards = () => {
+	const { setActiveBoardId, activeBoardId } = useActiveBoardId();
 	const { data: boards, status } = useQuery(["userBoards"], async () => {
 		const boards = (await client("/user/boards")) as Board[];
+
+		if (
+			activeBoardId === null ||
+			(activeBoardId === undefined && boards.length > 0)
+		) {
+			setActiveBoardId(boards[0].id);
+		}
+
 		return boards;
 	});
-
 	return { boards, status };
 };
 
