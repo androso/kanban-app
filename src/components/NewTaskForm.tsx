@@ -46,6 +46,7 @@ export default function NewTaskForm({
 					</button>
 				)}
 			</div>
+			<span>Note: Task is added to the currently active board</span>
 			<div className="form-control w-full max-w-xs">
 				<label className="label" htmlFor="title">
 					<span className="label-text">Title</span>
