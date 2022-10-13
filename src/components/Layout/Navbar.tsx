@@ -17,6 +17,7 @@ import { useForm } from "react-hook-form";
 
 import { Board, BoardFormTypes } from "../../lib/types";
 import BoardFormFields from "../BoardFormFields";
+import EditBoardForm from "../EditBoardForm";
 
 // navigation bar + sidebar (desktop)
 
@@ -147,7 +148,12 @@ export default function Navbar({
 				{activeBoard && (
 					<button
 						className="btn btn-primary mr-3 hidden md:block"
-						onClick={openDialog}
+						onClick={() => {
+							setDialogCategory("newTask");
+							setBoardToDelete(null);
+							setBoardToEdit(null);
+							openDialog();
+						}}
 					>
 						+ New Task
 					</button>
@@ -229,44 +235,5 @@ export default function Navbar({
 				)}
 			</Dialog>
 		</>
-	);
-}
-// TODO: abstract a boardFormFields component to be used in Edit and New
-function EditBoardForm({
-	boardToEdit,
-	closeUpperModal,
-}: {
-	boardToEdit: Board | null;
-	closeUpperModal: () => void;
-}) {
-	// here we're gonna use the hook
-	const { mutateAsync } = useEditBoard();
-
-	const form = useForm<BoardFormTypes>({
-		defaultValues: {
-			description: boardToEdit?.description || "",
-			title: boardToEdit?.title || "",
-		},
-	});
-
-	const submitForm = async (data: BoardFormTypes) => {
-		try {
-			if (boardToEdit) {
-				await mutateAsync({
-					...boardToEdit,
-					description: data.description,
-					title: data.title,
-				});
-				closeUpperModal();
-			}
-		} catch (e) {
-			toast.error("Error while editing board");
-		}
-	};
-
-	return (
-		<form onSubmit={form.handleSubmit(submitForm)}>
-			<BoardFormFields formMethods={form} mode="Edit" />
-		</form>
 	);
 }
