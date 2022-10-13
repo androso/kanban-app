@@ -37,7 +37,10 @@ export default function EditBoardForm({
 	};
 
 	return (
-		<form onSubmit={form.handleSubmit(submitForm)}>
+		<form
+			onSubmit={form.handleSubmit(submitForm)}
+			className="prose max-w-xs mx-auto"
+		>
 			<BoardFormFields formMethods={form} mode="Edit" />
 		</form>
 	);
