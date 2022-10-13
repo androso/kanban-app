@@ -6,6 +6,8 @@ import NewBoardForm from "../NewBoardForm";
 import { Icon } from "@iconify/react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { Board } from "../../lib/types";
+import EditBoardForm from "../EditBoardForm";
 
 export default function Drawer({
 	children,
@@ -19,9 +21,15 @@ export default function Drawer({
 	const { boards } = useBoards();
 	const { showDialog, openDialog, closeDialog } = useDialog();
 	const [dialogCategory, setDialogCategory] = useState<
-		"newBoard" | "deleteBoardAlert" | null
+		"newBoard" | "deleteBoardAlert" | "editBoard" | null
 	>(null);
-	const { status, mutateAsync: deleteBoardAsync, boardToDelete, setBoardToDelete } = useDeleteBoard();
+	const [boardToEdit, setBoardToEdit] = useState<Board | null>(null);
+	const {
+		status,
+		mutateAsync: deleteBoardAsync,
+		boardToDelete,
+		setBoardToDelete,
+	} = useDeleteBoard();
 
 	return (
 		<div>
@@ -49,9 +57,16 @@ export default function Drawer({
 											e.stopPropagation();
 										}}
 									>
-										{/* <span className="btn-ghost p-1 rounded-md">
+										<span
+											className="btn-ghost p-1 rounded-md"
+											onClick={() => {
+												setDialogCategory("editBoard");
+												setBoardToEdit(board);
+												openDialog();
+											}}
+										>
 											<Icon icon="icon-park-outline:pencil" />
-										</span> */}
+										</span>
 										<span
 											className="btn-ghost p-1 rounded-md transition-colors hover:bg-error hover:text-primary-content"
 											onClick={(e) => {
@@ -88,6 +103,11 @@ export default function Drawer({
 			>
 				{dialogCategory === "newBoard" ? (
 					<NewBoardForm closeUpperModal={closeDialog} />
+				) : dialogCategory === "editBoard" ? (
+					<EditBoardForm
+						boardToEdit={boardToEdit}
+						closeUpperModal={closeDialog}
+					/>
 				) : (
 					<div className=" prose">
 						<h4 className="mb-4">
