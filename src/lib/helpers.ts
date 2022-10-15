@@ -32,7 +32,7 @@ export const client = async (
 			return response.text();
 		}
 	} else if (!response.ok) {
-		const errorMessage = await response.text();
+		const errorMessage = response.statusText;
 		return Promise.reject(new Error(errorMessage));
 	} else {
 		return response;
