@@ -22,9 +22,36 @@ export interface BoardFormTypes {
 	title: string;
 	description: string;
 }
-export type Board = {
+export interface Board {
 	created_at: string;
 	description: string;
 	id: number;
 	title: string;
+}
+
+export type BoardStatus = {
+	id: number;
+	title: string;
+	color: string;
 };
+export interface BoardFormatted extends Board {
+	statuses: BoardStatus[];
+}
+
+// SUBTASK RELATED TYPES
+export interface SubtaskFormType {
+	title: string;
+}
+
+// TASK RELATED TYPES
+export interface TaskFormTypes {
+	title: string;
+	description: string;
+	statusId: string;
+	subtasks: SubtaskFormType[];
+}
+
+export enum ReactQueryQueries {
+	USER_BOARDS = "userBoards",
+	ACTIVE_BOARD = "activeBoard",
+}
