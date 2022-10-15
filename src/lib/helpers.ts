@@ -17,26 +17,25 @@ export const client = async (
 			...customConfig.headers,
 		},
 	};
-	
+
 	if (body) {
 		config.body = body;
 	}
 
-	let dataReturned;
-
 	const response = await window.fetch(`${API}${endpoint}`, config);
-	// todo: should we return something like {message: string, status: number} from the server?
-	// todo if we don't, we shouldn't .json() the response.
-	if (response.status === 204) {
-		return response;
-	} else if (response.ok) {
-		dataReturned = await response.json();
-		return dataReturned;
-	} else if (response.status === 404) {
-		return Promise.reject(new Error(response.statusText));
+
+	if (response.ok) {
+		try {
+			const responseParsed = await response.clone().json();
+			return responseParsed;
+		} catch (e) {
+			return response.text();
+		}
+	} else if (!response.ok) {
+		const errorMessage = await response.text();
+		return Promise.reject(new Error(errorMessage));
 	} else {
-		const errorMessage = await response.json();
-		return Promise.reject(new Error(errorMessage.message));
+		return response;
 	}
 };
 
