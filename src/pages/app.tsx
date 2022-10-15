@@ -63,16 +63,11 @@ function App() {
 						setActiveBoardId={setActiveBoardId}
 					/>
 
-					<section
-						id="kanban-container"
-						className="w-full overflow-x-auto whitespace-nowrap !h-[calc(100%-64px)] p-2"
-					>
-						{activeBoardStatus === "success" && activeBoard ? (
-							<KanbanApp />
-						) : (
-							<h1>No boards created yet</h1>
-						)}
-					</section>
+					{activeBoardStatus === "success" && activeBoard ? (
+						<KanbanApp />
+					) : (
+						<h1>No boards created yet</h1>
+					)}
 
 					{/* Actions Dropdown */}
 					<div className="dropdown dropdown-top dropdown-left absolute bottom-6 right-6 md:hidden">

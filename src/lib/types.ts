@@ -36,19 +36,34 @@ export type BoardStatus = {
 };
 export interface BoardFormatted extends Board {
 	statuses: BoardStatus[];
+	tasks: TaskFormatted[];
 }
 
 // SUBTASK RELATED TYPES
 export interface SubtaskFormType {
 	title: string;
 }
-
+export interface SubtaskFormatted {
+	id: number;
+	taskId: number;
+	title: string;
+	completed: boolean;
+}
 // TASK RELATED TYPES
 export interface TaskFormTypes {
 	title: string;
 	description: string;
 	statusId: number;
 	subtasks: SubtaskFormType[];
+}
+
+export interface TaskFormatted {
+	id: number;
+	title: string;
+	description: string;
+	boardId: number;
+	statusId: number;
+	subtasks: SubtaskFormatted[];
 }
 
 export enum ReactQueryQueries {
