@@ -4,7 +4,7 @@ import PageContainer from "../components/Layout/PageContainer";
 import { useAuth } from "../lib/hooks/useAuth";
 import useProtectedRoute from "../lib/hooks/useProtectedRoute";
 import Navbar from "../components/Layout/Navbar";
-import { useActiveBoard, useBoards } from "../lib/hooks/boards";
+import { useActiveBoard } from "../lib/hooks/boards";
 import Drawer from "../components/Layout/Drawer";
 import {
 	ActiveBoardIdProvider,
@@ -13,10 +13,10 @@ import {
 import { Icon } from "@iconify/react";
 import Dialog from "@reach/dialog";
 import { useDialog } from "../lib/hooks/useDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NewBoardForm from "../components/NewBoardForm";
 import NewTaskForm from "../components/NewTaskForm";
-
+import KanbanApp from "../components/KanbanApp";
 export default function AppWrapper() {
 	return (
 		<>
@@ -42,7 +42,7 @@ function App() {
 	// if it's null, means user dosn't have any boards created.
 	// const [activeBoardId, setActiveBoardId] = useState<number | null>(null);
 	const { activeBoardId, setActiveBoardId } = useActiveBoardId();
-	const { data: activeBoard } = useActiveBoard();
+	const { data: activeBoard, status: activeBoardStatus } = useActiveBoard();
 	// const activeBoard = boards?.find((board) => board.id === activeBoardId);
 	const { showDialog, openDialog, closeDialog } = useDialog();
 	const [dialogAction, setDialogAction] = useState<
@@ -62,8 +62,19 @@ function App() {
 						activeBoardId={activeBoardId}
 						setActiveBoardId={setActiveBoardId}
 					/>
-					<h1>{activeBoard?.title}</h1>
 
+					<section
+						id="kanban-container"
+						className="w-full overflow-x-auto whitespace-nowrap !h-[calc(100%-64px)] p-2"
+					>
+						{activeBoardStatus === "success" && activeBoard ? (
+							<KanbanApp />
+						) : (
+							<h1>No boards created yet</h1>
+						)}
+					</section>
+
+					{/* Actions Dropdown */}
 					<div className="dropdown dropdown-top dropdown-left absolute bottom-6 right-6 md:hidden">
 						<label
 							tabIndex={0}

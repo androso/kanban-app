@@ -44,7 +44,7 @@ export default function Navbar({
 
 	return (
 		<>
-			<div className="navbar flex md:justify-end items-center justify-between bg-[#242933] ">
+			<nav className="navbar flex md:justify-end items-center justify-between bg-[#242933] max-h-16">
 				<div className="flex-1  md:hidden">
 					<div className="dropdown">
 						{status === "loading" ? (
@@ -188,7 +188,7 @@ export default function Navbar({
 						</li>
 					</ul>
 				</div>
-			</div>
+			</nav>
 			<Dialog
 				isOpen={showDialog}
 				onDismiss={closeDialog}
