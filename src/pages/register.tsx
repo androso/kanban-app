@@ -37,21 +37,21 @@ export default function Register() {
 					)}
 
 					<div className="form-control w-full max-w-xs">
-						<label htmlFor="username" className="label">
+						<label htmlFor="email" className="label">
 							<span className="label-text">Email</span>
 						</label>
 						<input
 							type="email"
 							name="email"
 							placeholder="type here"
-							id="username"
+							id="email"
 							className="input input-bordered"
 							required
 						/>
 					</div>
 					<div className="form-control w-full max-w-xs">
-						<label htmlFor="name" className="label">
-							<span className="label-text">Name</span>
+						<label htmlFor="username" className="label">
+							<span className="label-text">Username</span>
 						</label>
 						<input
 							type="text"
