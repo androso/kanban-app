@@ -6,17 +6,14 @@ import {
 	useActiveBoard,
 	useBoards,
 	useDeleteBoard,
-	useEditBoard,
 } from "../../lib/hooks/boards";
 import { Icon } from "@iconify/react";
 import { useDialog } from "../../lib/hooks/useDialog";
 import Dialog from "@reach/dialog";
 import NewTaskForm from "../NewTaskForm";
 import toast from "react-hot-toast";
-import { useForm } from "react-hook-form";
 
 import { Board, BoardFormTypes } from "../../lib/types";
-import BoardFormFields from "../BoardFormFields";
 import EditBoardForm from "../EditBoardForm";
 
 // navigation bar + sidebar (desktop)
@@ -30,7 +27,7 @@ export default function Navbar({
 }) {
 	const { logout } = useAuth();
 	const { boards, status } = useBoards();
-	const { activeBoard } = useActiveBoard();
+	const { data: activeBoard } = useActiveBoard();
 	const { showDialog, openDialog, closeDialog } = useDialog();
 	const [dialogCategory, setDialogCategory] = useState<
 		"deleteBoardAlert" | "newTask" | "editBoard" | null
@@ -195,7 +192,7 @@ export default function Navbar({
 			<Dialog
 				isOpen={showDialog}
 				onDismiss={closeDialog}
-				className="!bg-base-100 max-w-md rounded-md relative"
+				className="!bg-base-100 max-w-md !w-fit rounded-md relative"
 				aria-label="Create new board"
 			>
 				{dialogCategory === "deleteBoardAlert" ? (

@@ -4,7 +4,7 @@ import PageContainer from "../components/Layout/PageContainer";
 import { useAuth } from "../lib/hooks/useAuth";
 import useProtectedRoute from "../lib/hooks/useProtectedRoute";
 import Navbar from "../components/Layout/Navbar";
-import { useBoards } from "../lib/hooks/boards";
+import { useActiveBoard, useBoards } from "../lib/hooks/boards";
 import Drawer from "../components/Layout/Drawer";
 import {
 	ActiveBoardIdProvider,
@@ -16,7 +16,6 @@ import { useDialog } from "../lib/hooks/useDialog";
 import { useState } from "react";
 import NewBoardForm from "../components/NewBoardForm";
 import NewTaskForm from "../components/NewTaskForm";
-import { DndContext } from "@dnd-kit/core";
 
 export default function AppWrapper() {
 	return (
@@ -40,11 +39,11 @@ function App() {
 			toast.error("Error while logging out");
 		}
 	};
-	const { boards, status: boardsStatus } = useBoards();
 	// if it's null, means user dosn't have any boards created.
 	// const [activeBoardId, setActiveBoardId] = useState<number | null>(null);
 	const { activeBoardId, setActiveBoardId } = useActiveBoardId();
-	const activeBoard = boards?.find((board) => board.id === activeBoardId);
+	const { data: activeBoard } = useActiveBoard();
+	// const activeBoard = boards?.find((board) => board.id === activeBoardId);
 	const { showDialog, openDialog, closeDialog } = useDialog();
 	const [dialogAction, setDialogAction] = useState<
 		"newTask" | "newBoard" | null
@@ -63,7 +62,7 @@ function App() {
 						activeBoardId={activeBoardId}
 						setActiveBoardId={setActiveBoardId}
 					/>
-					<DndContext></DndContext>
+					<h1>{activeBoard?.title}</h1>
 
 					<div className="dropdown dropdown-top dropdown-left absolute bottom-6 right-6 md:hidden">
 						<label
