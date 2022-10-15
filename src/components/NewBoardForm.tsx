@@ -1,5 +1,6 @@
 import React from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { useActiveBoardId } from "../lib/context/activeBoardId";
 import { useCreateBoard } from "../lib/hooks/boards";
 import { BoardFormTypes } from "../lib/types";
@@ -11,19 +12,19 @@ export default function NewBoardForm({
 	closeUpperModal?: () => void;
 }) {
 	const form = useForm<BoardFormTypes>({});
-	const { mutate: createBoard, status, data } = useCreateBoard();
-	const submitForm = async (data: BoardFormTypes) => {
-		createBoard(data);
-	};
+	const { mutateAsync: createBoardAsync } = useCreateBoard();
 	const { setActiveBoardId } = useActiveBoardId();
-
-	React.useEffect(() => {
-		if (status === "success" && data && closeUpperModal) {
-			setActiveBoardId(data.id);
-			closeUpperModal();
+	const submitForm = async (data: BoardFormTypes) => {
+		try {
+			const boardCreated = await createBoardAsync(data);
+			setActiveBoardId(boardCreated.id);
+			closeUpperModal?.();
+		} catch (e) {
+			console.error(e);
+			toast.error("Error while creating a board");
 		}
-	}, [status, data, closeUpperModal, setActiveBoardId]);
-
+	};
+	
 	return (
 		<form
 			className="prose max-w-xs mx-auto"
