@@ -1,19 +1,22 @@
 import { useForm, useFieldArray, appendErrors } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { Icon } from "@iconify/react";
-import type { NewTaskFormTypes } from "../lib/types";
+import type { NewTaskFormTypes, TaskFormTypes } from "../lib/types";
+import { useCreateTask } from "../lib/hooks/tasks";
+import { useActiveBoard } from "../lib/hooks/boards";
 
 export default function NewTaskForm({
 	closeUpperModal,
 }: {
 	closeUpperModal?: () => void;
 }) {
+	const { data: activeBoard } = useActiveBoard();
 	const {
 		register,
 		control,
 		handleSubmit,
 		formState: { errors },
-	} = useForm<NewTaskFormTypes>({
+	} = useForm<TaskFormTypes>({
 		defaultValues: {
 			subtasks: [{ title: "" }],
 		},
@@ -25,8 +28,18 @@ export default function NewTaskForm({
 			required: "Required",
 		},
 	});
-	const submitForm = (data: unknown) => {
-		console.log(data);
+	const { mutateAsync: createTaskAsync } = useCreateTask();
+
+	const submitForm = async (data: TaskFormTypes) => {
+		const formattedData = { ...data, statusId: Number(data.statusId) };
+
+		try {
+			console.log("sending formatted data", formattedData);
+			await createTaskAsync(formattedData);
+			closeUpperModal?.();
+		} catch (e) {
+			console.error(e);
+		}
 	};
 
 	return (
@@ -70,7 +83,7 @@ export default function NewTaskForm({
 				</label>
 				<textarea
 					{...register("description", { required: "This field is required" })}
-					placeholder="e.g Take coffee break"
+					placeholder="e.g Take it very slowly"
 					id="description"
 					className="textarea textarea-bordered"
 				></textarea>
@@ -94,7 +107,7 @@ export default function NewTaskForm({
 										required: "This field is required",
 									})}
 									id={`subtasks.${index}.title`}
-									placeholder="e.g Take coffee break"
+									placeholder="e.g drink it with the left hand"
 									className="input input-bordered focus:outline-offset-0 w-full rounded-r-none"
 								/>
 								<button
@@ -134,7 +147,7 @@ export default function NewTaskForm({
 					className="select select-bordered"
 					defaultValue={0}
 					id="status"
-					{...register("status", {
+					{...register("statusId", {
 						validate: (val) =>
 							Number(val) > 0 || "You must select a valid status",
 					})}
@@ -142,6 +155,13 @@ export default function NewTaskForm({
 					<option value={0} disabled>
 						Select status
 					</option>
+					{activeBoard?.statuses.map((status) => {
+						return (
+							<option value={status.id} key={status.id}>
+								{status.title}
+							</option>
+						);
+					})}
 				</select>
 				<label className="label" htmlFor="status">
 					<span className="label-text text-error">
