@@ -3,52 +3,47 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { queryClient } from "../../pages/_app";
 import { useActiveBoardId } from "../context/activeBoardId";
-
 import { client } from "../helpers";
-import { Board, BoardFormTypes } from "../types";
-
-const fakeBoards = [
-	{
-		id: 1,
-		created_at: new Date(),
-		title: "Board 1",
-		description: "Board 1 description",
-	},
-	{
-		id: 2,
-		created_at: new Date(),
-		title: "Board 2",
-		description: "Board 2 description",
-	},
-	{
-		id: 3,
-		created_at: new Date(),
-		title: "Board 3",
-		description: "Board 3 description",
-	},
-];
+import {
+	Board,
+	BoardFormatted,
+	BoardFormTypes,
+	ReactQueryQueries,
+} from "../types";
 
 export const useBoards = () => {
 	const { setActiveBoardId, activeBoardId } = useActiveBoardId();
-	const { data: boards, status } = useQuery(["userBoards"], async () => {
-		const boards = (await client("/user/boards")) as Board[];
+	const { data: boards, status } = useQuery(
+		[ReactQueryQueries.USER_BOARDS],
+		async () => {
+			const boards = (await client("/user/boards")) as Board[];
+			if (
+				!window.localStorage.getItem("kanban-activeBoardId") &&
+				activeBoardId === undefined &&
+				boards.length > 0
+			) {
+				setActiveBoardId(boards[0].id);
+			}
 
-		if (
-			activeBoardId === null ||
-			(activeBoardId === undefined && boards.length > 0)
-		) {
-			setActiveBoardId(boards[0].id);
+			return boards;
 		}
-
-		return boards;
-	});
+	);
 	return { boards, status };
 };
 
 export const useActiveBoard = () => {
 	const { activeBoardId } = useActiveBoardId();
-	const { boards } = useBoards();
-	return { activeBoard: boards?.find((board) => board.id === activeBoardId) };
+	const query = useQuery(
+		[ReactQueryQueries.ACTIVE_BOARD, activeBoardId],
+		async () => {
+			if (!activeBoardId) return null;
+			const board = (await client(
+				`/user/boards/${activeBoardId}`
+			)) as BoardFormatted;
+			return board;
+		}
+	);
+	return query;
 };
 
 export const useCreateBoard = () => {
@@ -57,8 +52,8 @@ export const useCreateBoard = () => {
 			return client("/user/boards", { body: JSON.stringify(newBoard) });
 		},
 		{
-			onSuccess: (data, variables) => {
-				queryClient.invalidateQueries(["userBoards"]);
+			onSuccess: (data) => {
+				queryClient.invalidateQueries([ReactQueryQueries.USER_BOARDS]);
 				console.log("board created succesfully!", data);
 			},
 		}
@@ -74,14 +69,14 @@ export const useDeleteBoard = () => {
 		},
 		{
 			onSuccess: (_, boardId) => {
-				queryClient.invalidateQueries(["userBoards"]);
-				console.log({ boardId });
+				queryClient.invalidateQueries([ReactQueryQueries.USER_BOARDS]);
+
 				if (boards && boards.length >= 2) {
 					const newBoards = boards.filter((board) => board.id !== boardId);
 					setActiveBoardId(newBoards[0].id);
 				} else if (boards && boards.length === 1) {
 					// deleting the only board
-					window.localStorage.removeItem("activeBoardId");
+					window.localStorage.removeItem("kanban-activeBoardId");
 				}
 			},
 			onError: (error) => {
@@ -113,7 +108,7 @@ export const useEditBoard = () => {
 		},
 		{
 			onSuccess: () => {
-				queryClient.invalidateQueries(["userBoards"]);
+				queryClient.invalidateQueries([ReactQueryQueries.USER_BOARDS]);
 			},
 		}
 	);

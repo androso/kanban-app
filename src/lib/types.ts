@@ -40,14 +40,14 @@ export interface BoardFormatted extends Board {
 
 // SUBTASK RELATED TYPES
 export interface SubtaskFormType {
-	title: string;
+	id: string;
 }
 
 // TASK RELATED TYPES
 export interface TaskFormTypes {
 	title: string;
 	description: string;
-	statusId: string;
+	statusId: number;
 	subtasks: SubtaskFormType[];
 }
 
