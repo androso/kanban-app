@@ -70,7 +70,7 @@ function App() {
 					)}
 
 					{/* Actions Dropdown */}
-					<div className="dropdown dropdown-top dropdown-left absolute bottom-6 right-6 md:hidden">
+					<div className="dropdown dropdown-top dropdown-left absolute bottom-6 right-6 lg:hidden">
 						<label
 							tabIndex={0}
 							className="btn btn-circle bg-primary hover:bg-primary-focus focus:bg-primary-focus m-1 text-3xl text-primary-content w-16 h-16"

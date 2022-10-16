@@ -44,8 +44,8 @@ export default function Navbar({
 
 	return (
 		<>
-			<nav className="navbar flex md:justify-end items-center justify-between bg-[#242933] max-h-16">
-				<div className="flex-1  md:hidden">
+			<nav className="navbar flex lg:justify-end items-center justify-between bg-[#242933] max-h-16">
+				<div className="flex-1  lg:hidden">
 					<div className="dropdown">
 						{status === "loading" ? (
 							<label className="btn btn-ghost">...</label>
@@ -144,7 +144,7 @@ export default function Navbar({
 				</div>
 				{activeBoard && (
 					<button
-						className="btn btn-primary mr-3 hidden md:block"
+						className="btn btn-primary mr-3 hidden lg:block"
 						onClick={() => {
 							setDialogCategory("newTask");
 							setBoardToDelete(null);

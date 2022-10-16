@@ -36,7 +36,7 @@ export default function Drawer({
 			<div className="drawer drawer-mobile z-0">
 				<span className="drawer-toggle"></span>
 				<div className="drawer-content relative">{children}</div>
-				<div className="drawer-side md:z-0">
+				<div className="drawer-side lg:z-0">
 					<label htmlFor="my-drawer-2" className="drawer-overlay"></label>
 					<ul className="menu p-4 overflow-y-auto bg-base-300 text-base-content max-w-[16rem] w-fit">
 						<div className="prose">
