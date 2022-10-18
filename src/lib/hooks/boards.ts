@@ -37,9 +37,11 @@ export const useActiveBoard = () => {
 		[ReactQueryQueries.ACTIVE_BOARD, activeBoardId],
 		async () => {
 			if (!activeBoardId) return null;
+			// console.log("refetching active board values")
 			const board = (await client(
 				`/user/boards/${activeBoardId}`
 			)) as BoardFormatted;
+			// console.log(board);
 			return board;
 		}
 	);

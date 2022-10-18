@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { useFieldArray, useForm } from "react-hook-form";
 import { useActiveBoardId } from "../lib/context/activeBoardId";
 import { client } from "../lib/helpers";
 import { useActiveBoard } from "../lib/hooks/boards";
@@ -129,19 +128,36 @@ function Subtask({
 	const [editMode, setEditMode] = useState(type === "new");
 	const { activeBoardId } = useActiveBoardId();
 
-	const saveSubtask = async () => {
+	const saveSubtask = async (
+		field: "completed" | "title",
+		value: string | boolean
+	) => {
 		// Save data to database
 		if (type === "fromDB") {
 			const subtask = data as SubtaskFormatted;
-			console.log("task from db");
-			console.log(checked, title, subtask.taskId, subtask.id);
-		} else if (setNewSubtasks) {
+
+			try {
+				await client(
+					`/user/boards/${activeBoardId}/tasks/${subtask.taskId}/subtasks/${subtask.id}`,
+					{
+						body: JSON.stringify({ [field]: value }),
+						method: "PATCH",
+					}
+				);
+				if (field === "completed") {
+					setChecked(value as boolean);
+				}
+				queryClient.invalidateQueries([ReactQueryQueries.ACTIVE_BOARD]);
+			} catch (e) {
+				console.error(e);
+			}
+		} else if (type === "new" && setNewSubtasks) {
 			const newSubtask = data as NewSubtaskType;
 			try {
 				await client(
 					`/user/boards/${activeBoardId}/tasks/${newSubtask.taskId}/subtasks`,
 					{
-						body: JSON.stringify({ title }),
+						body: JSON.stringify({ [field]: value }),
 						method: "POST",
 					}
 				);
@@ -158,20 +174,6 @@ function Subtask({
 				console.error(e);
 			}
 		}
-	};
-	const checkSubtask = async () => {
-		// if ((data as NewSubtaskType)?.isNew && setNewSubtasks && newSubtasks) {
-		// 	const updatedSubtasks = newSubtasks.map((subtask) => {
-		// 		if (subtask.key === data.key) {
-		// 			return {
-		// 				...subtask,
-		// 				completed: !subtask.completed,
-		// 			};
-		// 		}
-		// 		return subtask;
-		// 	});
-		// 	setNewSubtasks(updatedSubtasks);
-		// }
 	};
 	const deleteSubtask = async () => {
 		if ((data as NewSubtaskType)?.isNew && setNewSubtasks) {
@@ -196,10 +198,10 @@ function Subtask({
 			<input
 				type="checkbox"
 				checked={checked}
-				onChange={(e) => {
-					setChecked(e.target.checked);
-					checkSubtask();
+				onChange={async (e) => {
+					await saveSubtask("completed", !checked);
 				}}
+				disabled={type === "new"}
 				className="checkbox checkbox-primary mr-2"
 			/>
 			<input
@@ -223,8 +225,7 @@ function Subtask({
 					className="btn-ghost p-1 rounded-md"
 					type="button"
 					onClick={() => {
-						// TODO: Save subtask modified in the server
-						saveSubtask();
+						saveSubtask("title", title);
 						setEditMode(false);
 					}}
 				>
