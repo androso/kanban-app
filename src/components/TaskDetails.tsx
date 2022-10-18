@@ -1,13 +1,15 @@
 import { Icon } from "@iconify/react";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
-import { useFieldArray } from "react-hook-form";
+import toast from "react-hot-toast";
+import { client } from "../lib/helpers";
 import { useActiveBoard } from "../lib/hooks/boards";
 import {
+	ReactQueryQueries,
 	SubtaskFormatted,
 	SubtaskFormType,
 	TaskFormatted,
-	TaskFormTypes,
 } from "../lib/types";
+import { queryClient } from "../pages/_app";
 
 interface NewSubtaskType extends SubtaskFormType {
 	key: number;
@@ -15,19 +17,32 @@ interface NewSubtaskType extends SubtaskFormType {
 	completed: boolean;
 }
 export default function TaskDetails({ task }: { task: TaskFormatted }) {
-	const [dialogMode, setDialogMode] = useState<"view" | "edit" | "delete">(
-		"view"
-	);
 	const { data: activeBoard } = useActiveBoard();
 	const [newSubtasks, setNewSubtasks] = useState<NewSubtaskType[]>();
 	const changeStatus = async (e: ChangeEvent<HTMLSelectElement>) => {
 		console.log(e.currentTarget.selectedOptions[0].value);
 	};
+	const saveField = async (field: string, value: string) => {
+		try {
+			await client(`/user/boards/${activeBoard?.id}/tasks/${task.id}`, {
+				body: JSON.stringify({ [field]: value }),
+				method: "PATCH",
+			});
+			queryClient.invalidateQueries([ReactQueryQueries.ACTIVE_BOARD]);
+		} catch (error) {
+			console.error("Unable to update task.");
+		}
+	};
+    
 	return (
 		<form>
 			<input
 				className={`text-xl font-bold text-primary-content mb-4 bg-transparent w-full input focus:outline-none `}
 				defaultValue={task?.title}
+				onChange={async (e) => {
+					const newTitle = e.currentTarget.value;
+					await saveField("title", newTitle);
+				}}
 			/>
 			<input
 				className={`text-lg mb-3 bg-transparent w-full input focus:outline-none`}
@@ -91,7 +106,6 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 					})}
 				</select>
 			</div>
-			
 		</form>
 	);
 }
@@ -160,8 +174,6 @@ function Subtask({
 				defaultValue={data.title}
 				disabled={!editMode}
 				onClick={(e) => e.stopPropagation()}
-				onChange={() => {
-                }}
 			/>
 			{!editMode ? (
 				<button
