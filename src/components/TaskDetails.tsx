@@ -33,7 +33,7 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 			console.error("Unable to update task.");
 		}
 	};
-    
+
 	return (
 		<form>
 			<input
@@ -47,6 +47,10 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 			<input
 				className={`text-lg mb-3 bg-transparent w-full input focus:outline-none`}
 				defaultValue={task?.description}
+				onChange={async (e) => {
+					const newDescription = e.currentTarget.value;
+					await saveField("description", newDescription);
+				}}
 			/>
 			<p className="text-primary-content font-semibold mb-2">
 				Subtasks ({task?.subtasks.filter((subtask) => subtask.completed).length}{" "}
