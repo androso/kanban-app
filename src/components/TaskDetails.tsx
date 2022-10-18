@@ -1,5 +1,7 @@
 import { Icon } from "@iconify/react";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { useActiveBoardId } from "../lib/context/activeBoardId";
 import { client } from "../lib/helpers";
 import { useActiveBoard } from "../lib/hooks/boards";
 import {
@@ -12,12 +14,14 @@ import { queryClient } from "../pages/_app";
 
 interface NewSubtaskType extends SubtaskFormType {
 	key: number;
+	taskId: number;
 	isNew: boolean;
 	completed: boolean;
 }
 export default function TaskDetails({ task }: { task: TaskFormatted }) {
 	const { data: activeBoard } = useActiveBoard();
 	const [newSubtasks, setNewSubtasks] = useState<NewSubtaskType[]>();
+
 	const saveField = async (field: string, value: string) => {
 		try {
 			await client(`/user/boards/${activeBoard?.id}/tasks/${task.id}`, {
@@ -33,7 +37,7 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 	return (
 		<form>
 			<input
-				className={`text-xl font-bold text-primary-content mb-4 bg-transparent w-full input focus:outline-none `}
+				className={`text-xl font-bold text-primary-content mb-4 bg-transparent w-full  focus:outline-none `}
 				defaultValue={task?.title}
 				onChange={async (e) => {
 					const newTitle = e.currentTarget.value;
@@ -41,7 +45,7 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 				}}
 			/>
 			<input
-				className={`text-lg mb-3 bg-transparent w-full input focus:outline-none`}
+				className={`text-lg mb-3 bg-transparent w-full focus:outline-none`}
 				defaultValue={task?.description}
 				onChange={async (e) => {
 					const newDescription = e.currentTarget.value;
@@ -54,12 +58,13 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 			</p>
 			<ul>
 				{task?.subtasks.map((subTask) => {
-					return <Subtask key={subTask.id} data={subTask} />;
+					return <Subtask type="fromDB" key={subTask.id} data={subTask} />;
 				})}
 				{newSubtasks?.map((subtask) => {
 					return (
 						<Subtask
 							key={subtask.key}
+							type="new"
 							data={subtask}
 							setNewSubtasks={setNewSubtasks}
 						/>
@@ -76,6 +81,7 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 								key: !newSubtasks ? 0 : newSubtasks.length,
 								isNew: true,
 								completed: false,
+								taskId: task.id,
 							},
 						])
 					}
@@ -109,20 +115,49 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 		</form>
 	);
 }
-
 function Subtask({
 	data,
 	setNewSubtasks,
-	newSubtasks,
+	type,
 }: {
 	data: SubtaskFormatted | NewSubtaskType;
+	type: "fromDB" | "new";
 	setNewSubtasks?: Dispatch<SetStateAction<NewSubtaskType[] | undefined>>;
-	newSubtasks?: NewSubtaskType[];
 }) {
-	const [checked, setChecked] = useState(data?.completed ?? false);
-	const [editMode, setEditMode] = useState(data?.isNew ?? false);
-	const saveData = async () => {
+	const [checked, setChecked] = useState(data.completed);
+	const [title, setTitle] = useState(data.title);
+	const [editMode, setEditMode] = useState(type === "new");
+	const { activeBoardId } = useActiveBoardId();
+
+	const saveSubtask = async () => {
 		// Save data to database
+		if (type === "fromDB") {
+			const subtask = data as SubtaskFormatted;
+			console.log("task from db");
+			console.log(checked, title, subtask.taskId, subtask.id);
+		} else if (setNewSubtasks) {
+			const newSubtask = data as NewSubtaskType;
+			try {
+				await client(
+					`/user/boards/${activeBoardId}/tasks/${newSubtask.taskId}/subtasks`,
+					{
+						body: JSON.stringify({ title }),
+						method: "POST",
+					}
+				);
+				setChecked(false);
+
+				queryClient
+					.invalidateQueries([ReactQueryQueries.ACTIVE_BOARD])
+					.then(() => {
+						setNewSubtasks((oldSubtasks) =>
+							oldSubtasks?.filter((subtask) => subtask.key !== newSubtask.key)
+						);
+					});
+			} catch (e) {
+				console.error(e);
+			}
+		}
 	};
 	const checkSubtask = async () => {
 		// if ((data as NewSubtaskType)?.isNew && setNewSubtasks && newSubtasks) {
@@ -171,9 +206,9 @@ function Subtask({
 				className={`bg-transparent w-full focus:outline-none ${
 					editMode && "border-b-2"
 				} `}
-				defaultValue={data.title}
 				disabled={!editMode}
-				onClick={(e) => e.stopPropagation()}
+				value={title}
+				onChange={(e) => setTitle(e.target.value)}
 			/>
 			{!editMode ? (
 				<button
@@ -189,8 +224,8 @@ function Subtask({
 					type="button"
 					onClick={() => {
 						// TODO: Save subtask modified in the server
+						saveSubtask();
 						setEditMode(false);
-						saveData();
 					}}
 				>
 					<Icon icon="fa-regular:save" />

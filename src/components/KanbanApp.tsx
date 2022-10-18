@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useActiveBoard } from "../lib/hooks/boards";
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
 import { useDialog } from "../lib/hooks/useDialog";
@@ -62,6 +62,16 @@ export default function KanbanApp() {
 	const { data: activeBoard } = useActiveBoard();
 	const { openDialog, showDialog, closeDialog } = useDialog();
 	const [taskSelected, setTaskSelected] = useState<TaskFormatted>();
+	const [taskSelectedId, setTaskSelectedId] = useState<number>();
+	useEffect(() => {
+		if (taskSelectedId) {
+			const task = activeBoard?.tasks.find(
+				(task) => task.id === taskSelectedId
+			);
+			setTaskSelected(task);
+		}
+	}, [taskSelectedId, activeBoard]);
+	
 	return (
 		<section
 			id="kanban-container"
@@ -102,6 +112,7 @@ export default function KanbanApp() {
 														onClick={() => {
 															openDialog();
 															setTaskSelected(task);
+															setTaskSelectedId(task.id);
 														}}
 													>
 														{task.title}
