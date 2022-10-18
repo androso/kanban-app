@@ -43,6 +43,7 @@ export const useActiveBoard = () => {
 			return board;
 		}
 	);
+	// console.log(query.data);
 	return query;
 };
 
