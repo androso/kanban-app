@@ -1,6 +1,5 @@
 import { Icon } from "@iconify/react";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
-import toast from "react-hot-toast";
 import { client } from "../lib/helpers";
 import { useActiveBoard } from "../lib/hooks/boards";
 import {
@@ -19,9 +18,6 @@ interface NewSubtaskType extends SubtaskFormType {
 export default function TaskDetails({ task }: { task: TaskFormatted }) {
 	const { data: activeBoard } = useActiveBoard();
 	const [newSubtasks, setNewSubtasks] = useState<NewSubtaskType[]>();
-	const changeStatus = async (e: ChangeEvent<HTMLSelectElement>) => {
-		console.log(e.currentTarget.selectedOptions[0].value);
-	};
 	const saveField = async (field: string, value: string) => {
 		try {
 			await client(`/user/boards/${activeBoard?.id}/tasks/${task.id}`, {
@@ -99,7 +95,7 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 							?.id
 					}
 					className={`select select-bordered w-full`}
-					onChange={(e) => changeStatus(e)}
+					onChange={(e) => saveField("statusId", e.currentTarget.value)}
 				>
 					{activeBoard?.statuses.map((status) => {
 						return (
