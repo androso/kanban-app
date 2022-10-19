@@ -1,5 +1,6 @@
 import { Icon } from "@iconify/react";
 import { Dispatch, SetStateAction, useState } from "react";
+import toast from "react-hot-toast";
 import { useActiveBoardId } from "../lib/context/activeBoardId";
 import { client } from "../lib/helpers";
 import { useActiveBoard } from "../lib/hooks/boards";
@@ -17,7 +18,13 @@ interface NewSubtaskType extends SubtaskFormType {
 	isNew: boolean;
 	completed: boolean;
 }
-export default function TaskDetails({ task }: { task: TaskFormatted }) {
+export default function TaskDetails({
+	task,
+	onClose,
+}: {
+	task: TaskFormatted;
+	onClose: () => void;
+}) {
 	const { data: activeBoard } = useActiveBoard();
 	const [newSubtasks, setNewSubtasks] = useState<NewSubtaskType[]>();
 
@@ -32,9 +39,25 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 			console.error("Unable to update task.");
 		}
 	};
+	const deleteTask = async () => {
+		try {
+			await client(
+				`/user/boards/${activeBoard?.id}/tasks/${task.id}`,
+				undefined,
+				"DELETE"
+			);
+			queryClient.invalidateQueries([ReactQueryQueries.ACTIVE_BOARD]);
+			onClose();
+		} catch (error) {
+			console.error(error);
+			if (error instanceof Error) {
+				toast.error(error.message);
+			}
+		}
+	};
 
 	return (
-		<form>
+		<div>
 			<input
 				className={`text-xl font-bold text-primary-content mb-4 bg-transparent w-full  focus:outline-none `}
 				defaultValue={task?.title}
@@ -111,7 +134,13 @@ export default function TaskDetails({ task }: { task: TaskFormatted }) {
 					})}
 				</select>
 			</div>
-		</form>
+			<button
+				onClick={deleteTask}
+				className="btn btn-error hover:bg-red-600 text-primary-content transition-colors"
+			>
+				Delete
+			</button>
+		</div>
 	);
 }
 function Subtask({

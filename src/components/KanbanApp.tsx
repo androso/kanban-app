@@ -71,7 +71,7 @@ export default function KanbanApp() {
 			setTaskSelected(task);
 		}
 	}, [taskSelectedId, activeBoard]);
-	
+
 	return (
 		<section
 			id="kanban-container"
@@ -134,7 +134,10 @@ export default function KanbanApp() {
 				aria-label="Task Details"
 				className="!bg-base-100 max-w-md text-left rounded-md relative"
 			>
-				<TaskDetails task={taskSelected as TaskFormatted} />
+				<TaskDetails
+					task={taskSelected as TaskFormatted}
+					onClose={closeDialog}
+				/>
 			</Dialog>
 		</section>
 	);
