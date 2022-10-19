@@ -135,7 +135,6 @@ function Subtask({
 		// Save data to database
 		if (type === "fromDB") {
 			const subtask = data as SubtaskFormatted;
-
 			try {
 				await client(
 					`/user/boards/${activeBoardId}/tasks/${subtask.taskId}/subtasks/${subtask.id}`,
@@ -176,7 +175,7 @@ function Subtask({
 		}
 	};
 	const deleteSubtask = async () => {
-		if ((data as NewSubtaskType)?.isNew && setNewSubtasks) {
+		if (type === "new" && setNewSubtasks) {
 			// Remove from state
 			setNewSubtasks(
 				(prev) =>
@@ -186,6 +185,17 @@ function Subtask({
 			);
 		} else {
 			// send DELETE request to API
+			const subtask = data as SubtaskFormatted;
+			try {
+				await client(
+					`/user/boards/${activeBoardId}/tasks/${data.taskId}/subtasks/${subtask.id}`,
+					undefined,
+					"DELETE"
+				);
+				queryClient.invalidateQueries([ReactQueryQueries.ACTIVE_BOARD]);
+			} catch (e) {
+				console.error(e);
+			}
 		}
 	};
 
