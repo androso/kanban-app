@@ -3,8 +3,12 @@ import { useActiveBoard } from "../lib/hooks/boards";
 import { DndContext, useDroppable, useDraggable } from "@dnd-kit/core";
 import { useDialog } from "../lib/hooks/useDialog";
 import Dialog from "@reach/dialog";
-import { TaskFormatted } from "../lib/types";
+import { ReactQueryQueries, TaskFormatted } from "../lib/types";
 import TaskDetails from "./TaskDetails";
+import { client } from "../lib/helpers";
+import { useActiveBoardId } from "../lib/context/activeBoardId";
+import toast from "react-hot-toast";
+import { queryClient } from "../pages/_app";
 
 function DroppableColumn({
 	children,
@@ -63,6 +67,10 @@ export default function KanbanApp() {
 	const { openDialog, showDialog, closeDialog } = useDialog();
 	const [taskSelected, setTaskSelected] = useState<TaskFormatted>();
 	const [taskSelectedId, setTaskSelectedId] = useState<number>();
+	const [dialogCategory, setDialogCategory] = useState<
+		"add_status" | "task_details"
+	>();
+
 	useEffect(() => {
 		if (taskSelectedId) {
 			const task = activeBoard?.tasks.find(
@@ -77,7 +85,13 @@ export default function KanbanApp() {
 			id="kanban-container"
 			className="w-full overflow-x-auto whitespace-nowrap !h-[calc(100%-64px)] p-2"
 		>
-			<button className="btn btn-outline min-h-fit h-fit py-3 mb-4 hover:bg-primary hover:outline-none hover:border-transparent hover:text-primary-content transition-colors">
+			<button
+				onClick={() => {
+					setDialogCategory("add_status");
+					openDialog();
+				}}
+				className="btn btn-outline min-h-fit h-fit py-3 mb-4 hover:bg-primary hover:outline-none hover:border-transparent hover:text-primary-content transition-colors"
+			>
 				+ Add Column
 			</button>
 			<DndContext>
@@ -113,6 +127,7 @@ export default function KanbanApp() {
 															openDialog();
 															setTaskSelected(task);
 															setTaskSelectedId(task.id);
+															setDialogCategory("task_details");
 														}}
 													>
 														{task.title}
@@ -124,7 +139,15 @@ export default function KanbanApp() {
 							</div>
 						);
 					})}
-					<button className="btn btn-ghost min-h-max">+</button>
+					<button
+						className="btn btn-ghost min-h-max"
+						onClick={() => {
+							openDialog();
+							setDialogCategory("add_status");
+						}}
+					>
+						+
+					</button>
 				</div>
 			</DndContext>
 			{/* insert reach ui dialog */}
@@ -134,11 +157,75 @@ export default function KanbanApp() {
 				aria-label="Task Details"
 				className="!bg-base-100 max-w-md text-left rounded-md relative"
 			>
-				<TaskDetails
-					task={taskSelected as TaskFormatted}
-					onClose={closeDialog}
-				/>
+				{dialogCategory === "task_details" ? (
+					<TaskDetails
+						task={taskSelected as TaskFormatted}
+						onClose={closeDialog}
+					/>
+				) : (
+					<AddStatus onClose={closeDialog} />
+				)}
 			</Dialog>
 		</section>
+	);
+}
+
+function AddStatus({ onClose }: { onClose: () => void }) {
+	const { activeBoardId } = useActiveBoardId();
+	const createStatus = async (e: any) => {
+		e.preventDefault();
+		try {
+			const title = e.currentTarget.title.value;
+			const color = e.currentTarget.color.value;
+			await client(`/user/boards/${activeBoardId}/statuses`, {
+				body: JSON.stringify({ title, color }),
+			});
+			queryClient.invalidateQueries([ReactQueryQueries.ACTIVE_BOARD]);
+			onClose();
+		} catch (e) {
+			console.error(e);
+			if (e instanceof Error) {
+				if (e.message === "Conflict") {
+					toast.error("Status already created");
+				} else {
+					toast.error(e.message);
+				}
+			} else {
+				toast.error("Error while creating status");
+			}
+		}
+	};
+	return (
+		<form className="" onSubmit={createStatus}>
+			<h2 className="text-2xl font-bold text-primary-content">New Status</h2>
+			<div className="form-control">
+				<label htmlFor="title" className="label">
+					Title
+				</label>
+				<input
+					type="text"
+					id="title"
+					required
+					name="title"
+					className="input input-bordered"
+					placeholder="e.g paused"
+				/>
+			</div>
+			<div className="form-control mb-4">
+				<label htmlFor="color" className="label">
+					Color
+				</label>
+				<input
+					type="color"
+					id="color"
+					required
+					className="w-24 h-12"
+					name="color"
+				/>
+			</div>
+			<button className="btn btn-primary" type="submit">
+				Create
+			</button>
+		</form>
 	);
 }
