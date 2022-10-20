@@ -28,6 +28,7 @@ const useUser = () => {
 
 	const clearUser = () => {
 		queryClient.removeQueries(["user"]);
+		window.localStorage.removeItem("kanban-activeBoardId");
 	};
 
 	return {

@@ -8,7 +8,7 @@ export default function Register() {
 	// todo: if user is not logged in, show this.
 	useRedirectIfAuthorized();
 	const { register } = useAuth();
-	const [registerError, setRegisterError] = React.useState<null | Error>(null);
+	const [registerError, setRegisterError] = React.useState<null | string>(null);
 
 	const registerUser = async (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
@@ -19,7 +19,11 @@ export default function Register() {
 			await register($username.value, $email.value, $password.value);
 		} catch (error) {
 			if (error instanceof Error) {
-				setRegisterError(error);
+				if (error.message = "409") {
+					setRegisterError("User already exists");
+				} else {
+					setRegisterError("Error while registering");
+				}
 			}
 		}
 	};
@@ -32,7 +36,7 @@ export default function Register() {
 					</div>
 					{registerError && (
 						<span className="label-text text-error">
-							{registerError?.message}
+							{registerError}
 						</span>
 					)}
 

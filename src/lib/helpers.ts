@@ -32,8 +32,8 @@ export const client = async (
 			return response.text();
 		}
 	} else if (!response.ok) {
-		const errorMessage = response.statusText;
-		return Promise.reject(new Error(errorMessage));
+		const errorMessage = response.status;
+		return Promise.reject(new Error(errorMessage.toString()));
 	} else {
 		return response;
 	}

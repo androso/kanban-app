@@ -1,4 +1,3 @@
-import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "../../lib/hooks/useAuth";
 import Image from "next/image";
@@ -173,11 +172,13 @@ export default function Navbar({
 						tabIndex={0}
 						className="mt-4 p-2 shadow menu menu-compact dropdown-content bg-base-300 rounded-box w-52"
 					>
+						{/*
 						<li>
 							<Link href="/profile" shallow>
 								<a className="justify-between">Profile</a>
 							</Link>
 						</li>
+							*/}
 						<li>
 							<button
 								onClick={logout}

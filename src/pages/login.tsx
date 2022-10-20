@@ -21,7 +21,7 @@ export default function Login() {
 			await login($email.value, $password.value);
 		} catch (error) {
 			if (error instanceof Error) {
-				setLoginError(error);
+				// setLoginError(error);
 			}
 			toast.error("Invalid credentials");
 		}
