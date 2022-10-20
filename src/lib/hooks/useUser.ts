@@ -1,7 +1,6 @@
 import { User } from "../types";
 import { useQueryClient, useQuery } from "@tanstack/react-query";
 import { client } from "../helpers";
-
 const useUser = () => {
 	const queryClient = useQueryClient();
 
@@ -27,7 +26,8 @@ const useUser = () => {
 	};
 
 	const clearUser = () => {
-		queryClient.removeQueries(["user"]);
+		//queryClient.removeQueries([ReactQueryQueries.ACTIVE_BOARD, ReactQueryQueries.USER_BOARDS, "user"]);
+		queryClient.clear();
 		window.localStorage.removeItem("kanban-activeBoardId");
 	};
 
