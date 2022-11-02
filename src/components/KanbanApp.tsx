@@ -182,7 +182,7 @@ export default function KanbanApp() {
 				isOpen={showDialog}
 				onDismiss={closeDialog}
 				aria-label="Task Details"
-				className="!bg-base-100 max-w-md text-left rounded-md relative"
+				className="!bg-base-100 !w-[90vw] max-w-[490px] rounded-md relative text-left"
 			>
 				{dialogCategory === "task_details" ? (
 					<TaskDetails

@@ -26,7 +26,6 @@ const useUser = () => {
 	};
 
 	const clearUser = () => {
-		//queryClient.removeQueries([ReactQueryQueries.ACTIVE_BOARD, ReactQueryQueries.USER_BOARDS, "user"]);
 		queryClient.clear();
 		window.localStorage.removeItem("kanban-activeBoardId");
 	};
