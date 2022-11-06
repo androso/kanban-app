@@ -35,13 +35,6 @@ function App() {
 	// if user is logged in, allow them access.
 	const { user, status } = useProtectedRoute();
 	const { logout } = useAuth();
-	const closeSession = async () => {
-		try {
-			await logout();
-		} catch (e) {
-			toast.error("Error while logging out");
-		}
-	};
 	// if it's null, means user dosn't have any boards created.
 	// const [activeBoardId, setActiveBoardId] = useState<number | null>(null);
 	const { activeBoardId, setActiveBoardId } = useActiveBoardId();

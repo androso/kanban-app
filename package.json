@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "vercel": "vercel"
+    "vercel": "vercel",
+    "analyze": "ANALYZE=true && yarn build"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.0.5",

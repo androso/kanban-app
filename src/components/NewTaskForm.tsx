@@ -1,7 +1,7 @@
-import { useForm, useFieldArray, appendErrors } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { ErrorMessage } from "@hookform/error-message";
 import { Icon } from "@iconify/react";
-import type { NewTaskFormTypes, TaskFormTypes } from "../lib/types";
+import type { TaskFormTypes } from "../lib/types";
 import { useCreateTask } from "../lib/hooks/tasks";
 import { useActiveBoard } from "../lib/hooks/boards";
 
