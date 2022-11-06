@@ -3,10 +3,7 @@ export interface User {
 	id: number;
 	email: number;
 }
-export interface serverUser {
-	password: string;
-	created_at: Date;
-}
+
 export interface CustomServerResponse {
 	message: string;
 	status: number;

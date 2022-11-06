@@ -13,7 +13,7 @@ import {
 import { Icon } from "@iconify/react";
 import Dialog from "@reach/dialog";
 import { useDialog } from "../lib/hooks/useDialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import NewBoardForm from "../components/NewBoardForm";
 import NewTaskForm from "../components/NewTaskForm";
 import KanbanApp from "../components/KanbanApp";
