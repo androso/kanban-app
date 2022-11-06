@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import toast from "react-hot-toast";
+import toast from "react-hot-toast";	
 import LoadingSpinner from "../components/LoadingSpinner";
 import PageContainer from "../components/Layout/PageContainer";
 
@@ -10,7 +10,7 @@ import useRedirectIfAuthorized from "../lib/hooks/useRedirectIfAuthorized";
 export default function Login() {
 	const { status } = useRedirectIfAuthorized();
 
-	const [loginError, setLoginError] = React.useState<null | Error>(null);
+	const [loginError] = React.useState<null | Error>(null);
 	const { login } = useAuth();
 
 	const loginUser = async (event: React.FormEvent<HTMLFormElement>) => {
