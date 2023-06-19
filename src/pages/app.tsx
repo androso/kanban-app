@@ -13,10 +13,13 @@ import {
 import { Icon } from "@iconify/react";
 import Dialog from "@reach/dialog";
 import { useDialog } from "../lib/hooks/useDialog";
-import { useEffect, useState } from "react";
-import NewBoardForm from "../components/NewBoardForm";
-import NewTaskForm from "../components/NewTaskForm";
+import { useState, Suspense } from "react";
 import KanbanApp from "../components/KanbanApp";
+import dynamic from "next/dynamic";
+const DynamicNewTaskForm = dynamic(() => import("../components/NewTaskForm"));
+const DynamicNewBoardForm = dynamic(() => import("../components/NewBoardForm"));
+
+
 export default function AppWrapper() {
 	return (
 		<>
@@ -32,13 +35,6 @@ function App() {
 	// if user is logged in, allow them access.
 	const { user, status } = useProtectedRoute();
 	const { logout } = useAuth();
-	const closeSession = async () => {
-		try {
-			await logout();
-		} catch (e) {
-			toast.error("Error while logging out");
-		}
-	};
 	// if it's null, means user dosn't have any boards created.
 	// const [activeBoardId, setActiveBoardId] = useState<number | null>(null);
 	const { activeBoardId, setActiveBoardId } = useActiveBoardId();
@@ -112,11 +108,15 @@ function App() {
 						className="!bg-base-100 !w-[90vw] max-w-[490px] rounded-md relative"
 						aria-label="Create new board"
 					>
-						{dialogAction === "newBoard" ? (
-							<NewBoardForm closeUpperModal={closeDialog} />
-						) : (
-							<NewTaskForm closeUpperModal={closeDialog} />
-						)}
+						<Suspense fallback={<LoadingSpinner />}>
+							{dialogAction === "newBoard" ? (
+								<DynamicNewBoardForm closeUpperModal={closeDialog} />
+							) : (
+
+								<DynamicNewTaskForm closeUpperModal={closeDialog} />
+
+							)}
+						</Suspense>
 					</Dialog>
 				</Drawer>
 			) : null}
