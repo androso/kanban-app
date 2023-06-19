@@ -33,8 +33,7 @@ export const useAuth = () => {
 				password,
 			}),
 		});
-
-		if (result.status === 201) {
+		if (result.status === "201") {
 			router.push("/login", undefined, { shallow: true });
 		}
 	};
